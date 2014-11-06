@@ -1,61 +1,73 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #define TRUE 1
 #define FALSE 0
 
 int invalidExpression(char expression[100]);
 char * handSanitizer(char *x);
-char * replace( const char *toReplace, const char * replace, char * equation);
+char * replaceString( const char *toReplace, const char * replace, char * equation);
 
-void main(){
-
+int main(){
 	while(TRUE){
+		printf("\n");
 		printf("\nType in an expression to simplify\n");
-		
-		//char * name[1] = "wow";
 		
 		char input[100];
 		scanf(" %[^\n]s",input);
-		
-		if(strncmp(input, "break",5) ==0){
+
+		char * expression = (char *) malloc(sizeof(char) * (strlen(input)+1));
+		memcpy(expression,&input[0],strlen(input)+1);
+
+		//input = (char *) realloc(input,sizeof(char) * strlen(input));
+
+		if(strncmp(expression, "break",5) ==0){
+			free(expression);
 			break;
 		}
-		if(invalidExpression(input)){
+
+		if(invalidExpression(expression)){
 			continue;
 		}
+
 		printf("\tExpression was accepted \n");
-		
-		char* expression = handSanitizer(input);
+		expression = handSanitizer(expression);
 		free(expression);
-		
-		//printf("size of input: %d\n",sizeof(input));
-		//printf(expression);
-		//printf("size of expression: %d\n",strlen(expression));
+
 	}
-	
+	return 1;
 }
 
-int invalidExpression(char input[100]){
 
-	int len = strlen(input);
-	
+
+int invalidExpression(char * input){
+	size_t len = strlen(input);
+
 	if(len<3){
 		return TRUE;
 	}
+
 	char * equalsSign = strchr(input, '=');
+
 	if(equalsSign != NULL){
 		printf("Syntax Error: To short\n");
 		return TRUE;
+
 	}
+
 	char * multSign = strchr(input,'*');
 	char * addSign = strchr(input,'+');
 	char * minSign = strchr(input,'-');
 	char * divSign = strchr(input,'/');
+
 	if(!(multSign !=NULL || addSign !=NULL || minSign!=NULL || divSign!=NULL)){
 		printf("Syntax Error: Does not contain an opperator\n");
 		return TRUE;
+
 	}
+
 	
+
 	multSign = strrchr(input,'*');
 	addSign = strrchr(input, '+');
 	minSign = strrchr(input, '-');
@@ -64,132 +76,177 @@ int invalidExpression(char input[100]){
 	if(multSign == endChar || addSign == endChar || minSign == endChar || divSign ==endChar){
 		printf("Syntax Error: Ends with opperator\n");
 		return TRUE;
+
 	}
-	
+
 	char * startChar = &(input[0]);
 	if(multSign ==startChar || addSign == startChar || divSign == startChar){
 		printf("Syntax Error: Starts with invalid opperator\n");
 		return TRUE;
+
 	}
-	
 	//strpbrk
 	char invalidCharacters[] = "!\"#$%&\',:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWYZ[\\]_`~abcdefghijlmnopqrstuvwyz|{}\t\?";
 	char * invalCharTest= strpbrk(input,invalidCharacters);
 	if(invalCharTest !=NULL){
 		printf("Syntax Error: Invalid Character: %c\n",*invalCharTest);
 		return TRUE;
+
 	}
-	
-	
+
 	int openCount =0;
 	int closedCount = 0;
-	for(int i =0; i<len; i++){
+	int i;
+	for(i =0; i<len; i++){
 		if(strncmp(&input[i], "(",1)==0){
 		openCount++;
 		}
 		if(strncmp(&input[i], ")",1) ==0){
 		closedCount++;
 		}
+
 	}
+
 	if(closedCount !=openCount){
 		printf("Syntax Error: Uneven amount of Parenthesis\n");
 		printf("\tOpen Parenthesis: %d\n", openCount);
 		printf("\tClosed Parenthesis: %d\n", closedCount);
 		return TRUE;
+
 	}
-	
+
 	return FALSE;//good syntax
-	
-}
-char * handSanitizer(char *x) {//returns a string that is dynamically alcolated.  
-		char * fix = (char *) malloc(sizeof(char)* (strlen(x)+1));
-		strcpy(fix,x);
-		fix = replace(" ","",fix);
-		fix = replace("--","+",fix);
-		fix = replace("-", "+-",fix);
-		fix = replace("X", "x",fix);
-		fix = replace("^+-", "^-",fix);
-		fix = replace("*+-", "*-",fix);
-		fix = replace("(+-", "(-",fix);
-		fix = replace(")(",")*(",fix);
-		//memcpy(fix,fix,strlen(fix));
-		if(strncmp(fix,"+-",2)==0){
-			size_t len = strlen(fix);
-			memcpy(fix,&fix[1],len-1);
-			fix = (char *) realloc(fix,len-1);
-			fix[len-1]='\0';
-		}
-		printf("fix address: %d\n",&fix);
-		if(strncmp(fix,"+",1)==0){
-			size_t len = strlen(fix);
-			memcpy(fix,&fix[1],len-1);
-			fix = (char *) realloc(fix,len-1);
-			fix[len-1]='\0';
-		}
-		printf("fix address: %d\n",&fix);
-		
-		
-		//
-	
-		printf("Reformatted Equation: %s",fix);
-		return fix;
-		
-		
-		
+
 }
 
-char * replace( const char *toReplace, const char * replace, char * equation){
-	size_t len = strlen(toReplace);
-	for(int i= len-1; i<strlen(equation); i++){
-	
-		char blank[100];
-		char * compareTo = strncpy(blank,&equation[i-len],len);
-		compareTo[len]='\0';//add that null byte
-		
-		/*printf("\n");
-		printf(compareTo);
-		printf("\nan int: %d\n",strncmp(compareTo,toReplace,len));
-		printf("\n");
+char * handSanitizer(char *fix) {//returns a string that is dynamically alcolated.
+
+		fix = replaceString("--","+",fix);
+		fix = replaceString(" ","",fix);
+		fix = replaceString("-", "+-",fix);
+		fix = replaceString("X", "x",fix);
+		fix = replaceString("^+-", "^-",fix);
+		fix = replaceString("*+-", "*-",fix);
+		fix = replaceString("(+-", "(-",fix);
+		fix = replaceString(")(",")*(",fix);
+
+		/*
+
+		//memcpy(fix,fix,strlen(fix));
+
+		if(strncmp(fix,"+-",2)==0){
+
+			size_t len = strlen(fix);
+
+			memcpy(fix,&fix[1],len-1);
+
+			fix = (char *) realloc(fix,len-1);
+
+			fix[len-1]='\0';
+
+		}
+
+		if(strncmp(fix,"+",1)==0){
+
+			size_t len = strlen(fix);
+
+			memcpy(fix,&fix[1],len-1);
+
+			fix = (char *) realloc(fix,len-1);
+
+			fix[len-1]='\0';
+
+		}
+
 		*/
+		printf("Reformatted Equation: %s",fix);
+
+		return fix;
+}
+
+
+
+char * replaceString( const char *toReplace, const char * replace, char * equation){
+	size_t len = strlen(toReplace);
+	int i;
+	for(i= len-1; i<strlen(equation); i++){
+		char * compareTo = (char *) malloc(sizeof(char) * (len +1));
+		if(i>=len){//prevents invalid read 
+			memcpy(compareTo,&equation[i-len],len);
+		}
+		else{
+			memcpy(compareTo,&equation[i],len);		
+		}		
+
+		compareTo[len]='\0';//add that null byte
+
 		if(strncmp(compareTo,toReplace,len)==0){
-			printf("it got here\n");
-			//if toReplace is the same this substring of equation
-			//if true, then make a new string with the replaced value.
-			char * leftSide = (char *) malloc(((strlen(equation)-len+strlen(replace)+1) * sizeof(char)));
-			memcpy( leftSide, &equation[0], i-len);//get left side and put it into leftSide
+			char * result = (char *) malloc((strlen(equation)-len+strlen(replace)+1) * sizeof(char));
+			memcpy( result, equation, i-len);
+			memcpy( &result[i-len], replace, strlen(replace)); 
+			memcpy( &result[i-len+strlen(replace)], &equation[i], strlen(equation)-i);
+			result[strlen(equation)-len+strlen(replace)] = '\0';
+			
+
+			/*char * leftSide = (char *) malloc((i-len+1) * sizeof(char));
+
+			memcpy( leftSide, &equation[0], i-len);//get left side
+
 			leftSide[i-len] = '\0';
-			//make sure that it has enough memory to hold the size of the whole thing
-			
+
 			printf("\tLeft Side: %s\n",leftSide);
+
 			
+
 			char * rightSide = (char *) malloc((strlen(equation)-i+1) * sizeof(char));
+
 			memcpy( rightSide, &equation[i], strlen(equation)-i);//get right side
+
 			rightSide[strlen(equation)-i]='\0';
+
 			printf("\tRight Side: %s\n",rightSide);
 			
-			char * newString = strcat(strcat(leftSide,replace),rightSide);
-			printf("\tNew String: %s\n",newString);
-			/*printf("\tLeftSide strlen: %d\n",i-len);
-			printf("\tRightSide strlen: %d\n",strlen(rightSide));
-			printf("\tReplace strlen: %d\n",strlen(replace));
-			printf("\tthe index being replaced with null character: %d\n",i-len+strlen(rightSide)+strlen(replace));
-			*/
-			newString[i-len+strlen(rightSide)+strlen(replace)] = '\0';//add the null byte
+			char * leftAndTemp = (char *) malloc((strlen(leftSide)+strlen(replace)+1)* sizeof(char));
+			memcpy(leftAndTemp,leftSide,strlen(leftSide));
+			memcpy(&leftAndTemp[strlen(leftSide)],replace, strlen(replace));
+			leftAndTemp[strlen(leftSide)+strlen(replace)] = '\0';
+			printf("\tLeft and Temp: %s\n",leftAndTemp);
+
+			char * result = (char *) malloc((strlen(leftAndTemp) + strlen(rightSide)+1) *sizeof(char));
+			memcpy(result, leftAndTemp, strlen(leftAndTemp));
+			memcpy(&result[strlen(leftAndTemp)], rightSide, strlen(rightSide)+1);
+			printf("\tResultant String: %s\n",result);
+
 			
-			equation = (char *) realloc(equation,strlen(newString));
+
+			//char * newString = strcat(strcat(leftSide,replace),rightSide);
+
+			//printf("\tNew String: %s\n",newString);
+			
+
+			//newString[i-len+strlen(rightSide)+strlen(replace)] = '\0';//add the null byte
+			*/
+
 			printf("\tOld Equation: %s\n",equation);
-			memcpy(&equation[0], &newString[0],strlen(newString));
-			equation[i-len+strlen(rightSide)+strlen(replace)] = '\0';
-			//equation = newString;
+			equation = (char *) realloc(equation,strlen(result)+1);
+			memcpy(equation, result,strlen(result)+1);
+			//equation[i-len+strlen(rightSide)+strlen(replace)] = '\0';
+
 			printf("\tNew Equation: %s\n",equation);
-			i = i-len+strlen(replace);//continue looping with this new indx
-			free(leftSide);
-			free(rightSide);
+			i = i-strlen(replace);//continue looping with this new indx
+
+			//free(leftSide);
+
+			//free(rightSide);
+			//free(leftAndTemp);
+			free(result);
+
 		}
-		//free(compareTo);
+
+		free(compareTo);
+
 	}
+
 	return equation;
+
 }
-
-
-
