@@ -93,13 +93,13 @@ factor-z                        epsilon, *, /
 term-op                         *, /
 factor                          (, [, {, -, LITERAL_STRING, LITERAL_INT, LITERAL_HEX, LITERAL_FLOAT, LITERAL_FLOAT_HEX
 number                          LITERAL_INT, LITERAL_HEX, LITERAL_FLOAT, LITERAL_FLOAT_HEX
-id                                      LITERAL_STRING
+id                              LITERAL_STRING
 func-body                       (, epsilon
 func-arg                        epsilon, (, [, {, -, LITERAL_STRING, LITERAL_INT, LITERAL_HEX, LITERAL_FLOAT, LITERAL_FLOAT_HEX
 func                            LITERAL_STRING
 term                            (, [, {, -, LITERAL_STRING, LITERAL_INT, LITERAL_HEX, LITERAL_FLOAT, LITERAL_FLOAT_HEX
 expr                            (, [, {, -, LITERAL_STRING, LITERAL_INT, LITERAL_HEX, LITERAL_FLOAT, LITERAL_FLOAT_HEX
-S                                       (, [, {, -, LITERAL_STRING, LITERAL_INT, LITERAL_HEX, LITERAL_FLOAT, LITERAL_FLOAT_HEX
+S                               (, [, {, -, LITERAL_STRING, LITERAL_INT, LITERAL_HEX, LITERAL_FLOAT, LITERAL_FLOAT_HEX
                                 
 Follow sets
 Non-terminal                    Follow set
