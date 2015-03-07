@@ -21,22 +21,24 @@ OBJS = $(patsubst %,$(objdir)/%,$(_OBJS))
 
 buildinfo.o:
 	@echo "Generating build info..."
-	@echo $(shell git log -1 --pretty=oneline)
+	@echo $(shell git log -1 --abbrev-commit --pretty=oneline)
 	@echo "#include \"buildinfo.h\"" > $(srcdir)/$*.c
-	@echo "const char *buildVersion = \"$(subst \n,\\n,$(subst ",\\\",$(subst \\,\\\\,$(version))))\";" >> $(srcdir)/$*.c
-	@echo "const char *buildCommit = \"$(subst \n,\\n,$(subst ",\\\",$(subst \\,\\\\,$(shell git log -1 --pretty=%H))))\";" >> $(srcdir)/$*.c
-	@echo "const char *buildCommitShort = \"$(subst \n,\\n,$(subst ",\\\",$(subst \\,\\\\,$(shell git log -1 --pretty=%h))))\";" >> $(srcdir)/$*.c
-	@echo "const char *buildCommitDate = \"$(subst \n,\\n,$(subst ",\\\",$(subst \\,\\\\,$(shell git log -1 --pretty=%cD))))\";" >> $(srcdir)/$*.c
-	@echo "const char *buildDate = \"$(subst \n,\\n,$(subst ",\\\",$(subst \\,\\\\,$(shell date -R))))\";" >> $(srcdir)/$*.c
-	@echo "const char *buildAuthor = \"$(subst \n,\\n,$(subst ",\\\",$(subst \\,\\\\,$(shell git log -1 --pretty="%an <%ae>"))))\";" >> $(srcdir)/$*.c
-	@echo "const char *buildBranch = \"$(subst \n,\\n,$(subst ",\\\",$(subst \\,\\\\,$(shell git symbolic-ref HEAD))))\";" >> $(srcdir)/$*.c
-	@echo "const char *buildSubject = \"$(subst \n,\\n,$(subst ",\\\",$(subst \\,\\\\,$(shell git log -1 --pretty=%s))))\";" >> $(srcdir)/$*.c
-	@echo "const char *buildBody = \"$(subst \n,\\n,$(subst ",\\\",$(subst \\,\\\\,$(shell git log -1 --pretty=%b))))\";" >> $(srcdir)/$*.c
-	@echo "const char *buildInfo = \"$(subst \n,\\n,$(subst ",\\\",$(subst \\,\\\\,$(shell git log -1 --pretty=oneline))))\";" >> $(srcdir)/$*.c
-	$(CC) $(CFLAGS) $(INCLUDE) -c -o $(objdir)/$*.o $(srcdir)/$*.c
-
+	@echo "const char *buildVersion = \"$(subst ",\\\",$(version)))\";" >> $(srcdir)/$*.c
+	@echo "const char *buildCommit = \"$(subst ",\\\",$(shell git log -1 --pretty=%H))\";" >> $(srcdir)/$*.c
+	@echo "const char *buildCommitShort = \"$(subst ",\\\",$(shell git log -1 --pretty=%h))\";" >> $(srcdir)/$*.c
+	@echo "const char *buildCommitDate = \"$(subst ",\\\",$(shell git log -1 --pretty=%cD))\";" >> $(srcdir)/$*.c
+	@echo "const char *buildDate = \"$(subst ",\\\",$(shell date -R))\";" >> $(srcdir)/$*.c
+	@echo "const char *buildAuthor = \"$(subst ",\\\",$(shell git log -1 --pretty="%an <%ae>"))\";" >> $(srcdir)/$*.c
+	@echo "const char *buildBranch = \"$(subst ",\\\",$(shell git symbolic-ref HEAD))\";" >> $(srcdir)/$*.c
+	@echo "const char *buildSubject = \"$(subst ",\\\",$(shell git log -1 --pretty=%s))\";" >> $(srcdir)/$*.c
+	@echo "const char *buildBody = \"$(subst ",\\\",$(shell git log -1 --pretty=%b))\";" >> $(srcdir)/$*.c
+	@echo "const char *buildInfo = \"$(subst ",\\\",$(shell git log -1 --pretty=fuller))\";" >> $(srcdir)/$*.c
+#	$(CC) $(CFLAGS) $(INCLUDE) -c -o $(objdir)/$*.o $(srcdir)/$*.c
+	$(CC) $(CFLAGS) -c -o $(objdir)/$*.o $(srcdir)/$*.c
+	
 %.o:
-	$(CC) $(CFLAGS) $(INCLUDE) -c -o $(objdir)/$*.o $(srcdir)/$*.c
+#	$(CC) $(CFLAGS) $(INCLUDE) -c -o $(objdir)/$*.o $(srcdir)/$*.c
+	$(CC) $(CFLAGS) -c -o $(objdir)/$*.o $(srcdir)/$*.c
 
 main.exe: $(_OBJS)
 	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LIBS)

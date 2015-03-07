@@ -43,10 +43,10 @@ token lexerDefaultState(char *input, int *index){
 		if(lexerIgnoreWhitespace(index, &t)) goto lxDefaultStart;
 
 		// Check if is character is string or if is number
-		if(isdigit(input[*index])){
+		if(isdigit((int)input[*index])){
 			// Continue the lexer in a different state
 			return enterState(NUMBER);
-		} else if(isalpha(input[*index])){
+		} else if(isalpha((int)input[*index])){
 			// Continue the lexer in a different state
 			return enterState(STRING);
 		}
@@ -109,7 +109,7 @@ token lexerNumberLiteralState(char *input, int *index){
 	ssChar *top = NULL;
 
 	lxNumberStart:
-		if(isdigit(input[*index]) || ((t.type == LITERAL_HEX || t.type == LITERAL_FLOAT_HEX) && isxdigit(input[*index]))){
+		if(isdigit((int)input[*index]) || ((t.type == LITERAL_HEX || t.type == LITERAL_FLOAT_HEX) && isxdigit((int)input[*index]))){
 			top = ssPush(input[*index], top); // Push character to stack
 			(*index)++;
 			goto lxNumberStart;
@@ -177,7 +177,7 @@ token lexerStringLiteralState(char *input, int *index){
 	ssChar *top = NULL;
 
 	lxStringStart:
-		if(isalpha(input[*index]) || input[*index] == '_'){
+		if(isalpha((int)input[*index]) || input[*index] == '_'){
 			top = ssPush(input[*index], top); // Push character to stack
 			(*index)++; // Advance index
 			goto lxStringStart;

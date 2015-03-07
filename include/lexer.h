@@ -10,11 +10,11 @@ enum{
 	STRING,			// 2
 } typedef lxState;
 
-static const char *lxStateName[] = {
+/*static const char *lxStateName[] = {
     "DEFAULT",
 	"NUMBER",
 	"STRING"
-};
+};*/
 
 typedef struct lxStack{
 	lxState state;
