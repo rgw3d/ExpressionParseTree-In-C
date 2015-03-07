@@ -29,3 +29,15 @@
 *.hex
 npp.6.6.9.bin.minimalist/
 test.c
+
+# Makefile generated
+src/buildinfo.c
+
+# Eclipse files
+.project
+.cproject
+.settings/
+
+# Stack dumps / core dumps
+*.core
+*.stackdump
