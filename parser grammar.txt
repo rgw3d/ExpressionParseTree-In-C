@@ -2,52 +2,52 @@ Symbols: +-*/=()[]{}
 Literals: LITERAL_INT LITERAL_FLOAT LITERAL_HEX LITERAL_FLOAT_HEX LITERAL_STRING
 
 Grammar
-S			:=	expr
-				expr =
-				expr = expr
-expr		:=	expr + term
-				expr - term
-				term
-term 		:=	term * factor
-				term / factor
-				factor
-factor		:=  ( expr )
-				[ expr ]
-				{ expr }
-				*id*
+S      := expr
+          expr =
+          expr = expr
+expr   := expr + term
+          expr - term
+          term
+term   := term * factor
+          term / factor
+          factor
+factor := ( expr )
+          [ expr ]
+          { expr }
+          *id*
 
 LL(1) Grammar
-S			:=	expr act				// 1
-act			:=	= body					// 2
-				epsilon					// 3
-body		:=	expr					// 4
-				epsilon					// 5
-expr		:= 	term term-z				// 6
-term-z		:=	expr-op term term-z		// 7
-				epsilon					// 8
-expr-op		:=	+						// 9
-				-						// 10
-term		:=	term term-op factor		// 11
-factor-z	:=	term-op factor factor-z	// 12
-				epsilon					// 13
-term-op		:= 	*						// 14
-				/						// 15
-factor		:=	func					// 16
-				( expr )				// 17
-				[ expr ]				// 18
-				{ expr }				// 19
-				number					// 20
-				- number				// 21
-func		:= 	id func-body			// 22
-number		:=	LITERAL_INT				// 23
-				LITERAL_HEX				// 24
-				LITERAL_FLOAT			// 25
-				LITERAL_FLOAT_HEX		// 26
-id			:=	LITERAL_STRING			// 27
-func-body	:= 	( func-arg )			// 28
-				epsilon					// 29
-func-arg	:=	expr					// 30
-				epsilon					// 31
+S         := expr act                                // 1
+act       := = body                                  // 2
+             epsilon                                 // 3
+body      := expr                                    // 4
+             epsilon                                 // 5
+expr      := term term-z                             // 6
+term-z    := expr-op term term-z                     // 7
+             epsilon                                 // 8
+expr-op   := +                                       // 9
+             -                                       // 10
+term      := term term-op factor                     // 11
+factor-z  := term-op factor factor-z                 // 12
+             epsilon                                 // 13
+term-op   := *                                       // 14
+             /                                       // 15
+factor    := func                                    // 16
+             ( expr )                                // 17
+             [ expr ]                                // 18
+             { expr }                                // 19
+             number                                  // 20
+             - number                                // 21
+func      := id func-body                            // 22
+number    := LITERAL_INT                             // 23
+             LITERAL_HEX                             // 24
+             LITERAL_FLOAT                           // 25
+             LITERAL_FLOAT_HEX                       // 26
+id        := LITERAL_STRING                          // 27
+func-body := ( func-arg )                            // 28
+             epsilon                                 // 29
+func-arg  := expr                                    // 30
+             epsilon                                 // 31
 
 COMPACT
 S -> expr act
@@ -65,107 +65,74 @@ number -> int | hex | float | float_hex
 id -> string
 func-body -> ( func-arg ) | epsilon
 func-arg -> expr | epsilon
-				
+                                
 First sets
-Non-terminal		First set
-=					=
-epsilon				epsilon
-+					+
--					-
-*					*
-/					/
-(					(
-)					)
-[					[
-]					]
-{					{
-}					}
-LITERAL_INT			LITERAL_INT
-LITERAL_HEX			LITERAL_HEX
-LITERAL_FLOAT		LITERAL_FLOAT
-LITERAL_FLOAT_HEX	LITERAL_FLOAT_HEX
-LITERAL_STRING		LITERAL_STRING
-act					=, epsilon
-body				epsilon, (, [, {, -, LITERAL_STRING, LITERAL_HEX, LITERAL_FLOAT, LITERAL_FLOAT_HEX
-term-z				epsilon, +, -
-expr-op				+, -
-factor-z			epsilon, *, /
-term-op				*, /
-factor				(, [, {, -, LITERAL_STRING, LITERAL_INT, LITERAL_HEX, LITERAL_FLOAT, LITERAL_FLOAT_HEX
-number				LITERAL_INT, LITERAL_HEX, LITERAL_FLOAT, LITERAL_FLOAT_HEX
-id					LITERAL_STRING
-func-body			(, epsilon
-func-arg			epsilon, (, [, {, -, LITERAL_STRING, LITERAL_INT, LITERAL_HEX, LITERAL_FLOAT, LITERAL_FLOAT_HEX
-func				LITERAL_STRING
-term				(, [, {, -, LITERAL_STRING, LITERAL_INT, LITERAL_HEX, LITERAL_FLOAT, LITERAL_FLOAT_HEX
-expr				(, [, {, -, LITERAL_STRING, LITERAL_INT, LITERAL_HEX, LITERAL_FLOAT, LITERAL_FLOAT_HEX
-S					(, [, {, -, LITERAL_STRING, LITERAL_INT, LITERAL_HEX, LITERAL_FLOAT, LITERAL_FLOAT_HEX
-				
+Non-terminal                    First set
+=                               =
+epsilon                         epsilon
++                               +
+-                               -
+*                               *
+/                               /
+(                               (
+)                               )
+[                               [
+]                               ]
+{                               {
+}                               }
+LITERAL_INT                     LITERAL_INT
+LITERAL_HEX                     LITERAL_HEX
+LITERAL_FLOAT                   LITERAL_FLOAT
+LITERAL_FLOAT_HEX               LITERAL_FLOAT_HEX
+LITERAL_STRING                  LITERAL_STRING
+act                             =, epsilon
+body                            epsilon, (, [, {, -, LITERAL_STRING, LITERAL_HEX, LITERAL_FLOAT, LITERAL_FLOAT_HEX
+term-z                          epsilon, +, -
+expr-op                         +, -
+factor-z                        epsilon, *, /
+term-op                         *, /
+factor                          (, [, {, -, LITERAL_STRING, LITERAL_INT, LITERAL_HEX, LITERAL_FLOAT, LITERAL_FLOAT_HEX
+number                          LITERAL_INT, LITERAL_HEX, LITERAL_FLOAT, LITERAL_FLOAT_HEX
+id                                      LITERAL_STRING
+func-body                       (, epsilon
+func-arg                        epsilon, (, [, {, -, LITERAL_STRING, LITERAL_INT, LITERAL_HEX, LITERAL_FLOAT, LITERAL_FLOAT_HEX
+func                            LITERAL_STRING
+term                            (, [, {, -, LITERAL_STRING, LITERAL_INT, LITERAL_HEX, LITERAL_FLOAT, LITERAL_FLOAT_HEX
+expr                            (, [, {, -, LITERAL_STRING, LITERAL_INT, LITERAL_HEX, LITERAL_FLOAT, LITERAL_FLOAT_HEX
+S                                       (, [, {, -, LITERAL_STRING, LITERAL_INT, LITERAL_HEX, LITERAL_FLOAT, LITERAL_FLOAT_HEX
+                                
 Follow sets
-Non-terminal		Follow set
-S					$
-act					$
-body				$
-expr				), ], }, =, $
-term-z				), ], }, =, $
-expr-op				(, [, {, -, LITERAL_STRING, LITERAL_INT, LITERAL_HEX, LITERAL_FLOAT, LITERAL_FLOAT_HEX
-term				+, -, ), ], }, =, $
-factor-z			+, -, ), ], }, =, $	
-term-op				(, [, {, -, LITERAL_STRING, LITERAL_INT, LITERAL_HEX, LITERAL_FLOAT, LITERAL_FLOAT_HEX
-factor				*, /
-func				+, -, *, /, ), ], }, =, $
-number				+, -, *, /, ), ], }, =, $
-id					+, -, *, /, (, ), ], }, =, LITERAL_STRING, LITERAL_INT, LITERAL_HEX, LITERAL_FLOAT, LITERAL_FLOAT_HEX
-func-body			+, -, *, /, ), ], }, =, LITERAL_STRING, LITERAL_INT, LITERAL_HEX, LITERAL_FLOAT, LITERAL_FLOAT_HEX
-func-arg			)
+Non-terminal                    Follow set
+S                               $
+act                             $
+body                            $
+expr                            ), ], }, =, $
+term-z                          ), ], }, =, $
+expr-op                         (, [, {, -, LITERAL_STRING, LITERAL_INT, LITERAL_HEX, LITERAL_FLOAT, LITERAL_FLOAT_HEX
+term                            +, -, ), ], }, =, $
+factor-z                        +, -, ), ], }, =, $     
+term-op                         (, [, {, -, LITERAL_STRING, LITERAL_INT, LITERAL_HEX, LITERAL_FLOAT, LITERAL_FLOAT_HEX
+factor                          *, /
+func                            +, -, *, /, ), ], }, =, $
+number                          +, -, *, /, ), ], }, =, $
+id                              +, -, *, /, (, ), ], }, =, LITERAL_STRING, LITERAL_INT, LITERAL_HEX, LITERAL_FLOAT, LITERAL_FLOAT_HEX
+func-body                       +, -, *, /, ), ], }, =, LITERAL_STRING, LITERAL_INT, LITERAL_HEX, LITERAL_FLOAT, LITERAL_FLOAT_HEX
+func-arg                        )
 
 Parse table
-	 P[A,a]	+	-	*	/	=	(	[	{	)	]	}	LITERAL_STRING	LITERAL_INT	LITERAL_HEX	LITERAL_FLOAT	LITERAL_FLOAT_HEX
-        S 		1				1	1	1				1				1			1			1				1
-      act 					2																									
-     body 		4				4	4	4				4				4			4			4				4				
-     expr 		6				6	6	6				6				6			6			6				6				
-   term-z	7	7			8				8	8	8
-  expr-op 	9	10
-     term 		11				11	11	11				11				11			11			11				11
- factor-z 	13	13	12	12	13				12	12	12
-  term-op			14	15
-   factor 		21				17	18	19				16				20			20			20				20
-	 func												22
-   number												23				25			24			26
-	   id												27
-func-body 	29	29	29	29	29	28			29	29	29
- func-arg		30				30	30	30	31			30				30			30			30				30
-
-[Copied from above]
-S			:=	expr act				// 1
-act			:=	= body					// 2
-				epsilon					// 3
-body		:=	expr					// 4
-				epsilon					// 5
-expr		:= 	term term-z				// 6
-term-z		:=	expr-op term term-z		// 7
-				epsilon					// 8
-expr-op		:=	+						// 9
-				-						// 10
-term		:=	term term-op factor		// 11
-factor-z	:=	term-op factor factor-z	// 12
-				epsilon					// 13
-term-op		:= 	*						// 14
-				/						// 15
-factor		:=	func					// 16
-				( expr )				// 17
-				[ expr ]				// 18
-				{ expr }				// 19
-				number					// 20
-				- number				// 21
-func		:= 	id func-body			// 22
-number		:=	LITERAL_INT				// 23
-				LITERAL_HEX				// 24
-				LITERAL_FLOAT			// 25
-				LITERAL_FLOAT_HEX		// 26
-id			:=	LITERAL_STRING			// 27
-func-body	:= 	( func-arg )			// 28
-				epsilon					// 29
-func-arg	:=	expr					// 30
-				epsilon					// 31
+   P[A,a]        +       -       *       /       =       (       [       {       )       ]       }       LITERAL_STRING  LITERAL_INT     LITERAL_HEX     LITERAL_FLOAT   LITERAL_FLOAT_HEX
+        S                1                               1       1       1                                1               1               1               1               1
+      act                                        2                                                                                                                                                                                                       
+     body                4                               4       4       4                                4               4               4               4               4                               
+     expr                6                               6       6       6                                6               6               6               6               6                               
+   term-z        7       7                       8                               8       8       8
+  expr-op        9      10
+     term               11                              11      11      11                               11              11              11              11              11
+ factor-z       13      13      12      12      13                              12      12      12
+  term-op                       14      15
+   factor               21                              17      18      19                               16              20              20              20              20
+     func                                                                                                22
+   number                                                                                                23              25              24              26
+       id                                                                                                27
+func-body       29      29      29      29      29      28                      29      29      29
+ func-arg               30                              30      30      30      31                       30              30              30              30              30
