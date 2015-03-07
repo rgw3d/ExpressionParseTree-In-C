@@ -1,9 +1,10 @@
 #include "stringstack.h"
-#include <string.h>
 
-// Globals
-sPtr *spTop = NULL;
-bool ssCleanedUp = false;
+#include <string.h>
+#include "memwrapper.h"
+
+static sPtr *spTop = NULL;
+static bool ssCleanedUp = false;
 
 int ssLen(ssChar *top){
 	int length = 1;
@@ -21,7 +22,7 @@ int ssLen(ssChar *top){
 char *ssStr(ssChar *top){
 	int len = ssLen(top);
 	// Allocate memory
-	char *str = (char *)malloc(sizeof(char) * (len + 1));
+	char *str = (char *)mwalloc(sizeof(char) * (len + 1));
 
 	// Save reference
 	spPush(str);
@@ -45,7 +46,7 @@ char *ssStr(ssChar *top){
 
 // Pushes a character and return a pointer to the pushed element.
 ssChar *ssPush(char c, ssChar *top){
-	ssChar *e = (ssChar *)malloc(sizeof(ssChar));
+	ssChar *e = (ssChar *)mwalloc(sizeof(ssChar));
 
 	if(top != NULL){
 		e->prev = top;
@@ -64,7 +65,7 @@ ssChar *ssPop(ssChar *top){
 	ssChar *prev = top->prev;
 
 	// Free memory
-	free(top);
+	mwfree(top, sizeof(ssChar));
 
 	return prev;
 }
@@ -82,7 +83,7 @@ ssChar *ssRoot(ssChar *top){
 
 // Destroys the stack
 void ssDestroy(ssChar *top){
-	ssChar *prev = top->prev;
+	ssChar *prev = top;
 
 	while(prev != NULL){
 		prev = ssPop(prev);
@@ -91,7 +92,7 @@ void ssDestroy(ssChar *top){
 
 // Pushes a character and return a pointer to the pushed element.
 void spPush(char *p){
-	sPtr *e = (sPtr *)malloc(sizeof(sPtr));
+	sPtr *e = (sPtr *)mwalloc(sizeof(sPtr));
 
 	e->prev = spTop;
 
@@ -107,7 +108,7 @@ void spPop(){
 	sPtr *prev = spTop->prev;
 
 	// Free memory
-	free(spTop);
+	mwfree(spTop, sizeof(sPtr));
 
 	// Update new top
 	spTop = prev;
@@ -127,7 +128,7 @@ void spDestroy(){
 
 // Initializes the stack
 void spInit(){
-	spTop = (sPtr *)malloc(sizeof(sPtr));
+	spTop = (sPtr *)mwalloc(sizeof(sPtr));
 	spTop->prev = NULL;
 	spTop->p = NULL;
 }
@@ -143,7 +144,7 @@ void ssCleanup(){
 	while(prev != NULL){
 		// Free memory
 		if(prev->p != NULL){
-			free(prev->p);
+			mwfree(prev->p, sizeof(char) * (strlen(prev->p) + 1));
 		}
 
 		prev = prev->prev;

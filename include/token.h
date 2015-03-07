@@ -1,7 +1,12 @@
 #pragma once
 
+#include <stdbool.h>
+
+#define TOKEN_N 33
+
 enum{
 	ERROR = -1,				// -1 Illegal token
+	// Terminal symbols
     LITERAL_STRING,         //  0 String literal
     LITERAL_INT,            //  1 Integer literal
     LITERAL_FLOAT,          //  2 Floating point literal
@@ -19,28 +24,26 @@ enum{
 	SYMBOL_LCBRACKET,		// 14 Left curly brackets '{'
 	SYMBOL_RCBRACKET,		// 15 Right curly brackets '{'
 	CHAR_NUL,				// 16 NUL character, represents that the lexer has reached the end of input.
+	// Non-terminal symbols
+	SYM_S,					// 17 Start symbol
+	SYM_ACT,				// 18 Action symbol
+	SYM_BODY,				// 19 Body symbol
+	SYM_EXPR,				// 20 Expression symbol
+	SYM_TERM_Z,				// 21 Term-z symbol
+	SYM_EXPR_OP,			// 22 Expression operator symbol
+	SYM_TERM,				// 23 Term symbol
+	SYM_FACTOR_Z,			// 24 Factor-z symbol
+	SYM_TERM_OP,			// 25 Term operator symbol
+	SYM_FACTOR,				// 26 Factor symbol
+	SYM_FUNC,				// 27 Function symbol
+	SYM_NUMBER,				// 28 Number symbol
+	SYM_ID,					// 29 Identifier symbol
+	SYM_FUNC_BODY,			// 30 Function body symbol
+	SYM_FUNC_ARG,			// 31 Function argument symbol
+	EPSILON,				// 32 Epsilon
 } typedef tokenType;
 
-static const char *tokenTypeName[] = {
-    "ERROR",
-	"LITERAL_STRING",
-	"LITERAL_INT",
-	"LITERAL_FLOAT",
-	"LITERAL_HEX",
-	"LITERAL_FLOAT_HEX",
-	"SYMBOL_PLUS",
-	"SYMBOL_MINUS",
-	"SYMBOL_MULTIPLY",
-	"SYMBOL_DIVIDE",
-	"SYMBOL_EQUAL",
-	"SYMBOL_LPAREN",
-	"SYMBOL_RPAREN",
-	"SYMBOL_LSBRACKET",
-	"SYMBOL_RSBRACKET",
-	"SYMBOL_LCBRACKET",
-	"SYMBOL_RCBRACKET",
-	"CHAR_NUL"
-};
+extern const char *tokenTypeName[];
 
 typedef struct token{
     tokenType type;
@@ -48,3 +51,4 @@ typedef struct token{
 } token;
 
 void tokenCopy(token *src, token *dest);
+bool isTerminal(tokenType t);

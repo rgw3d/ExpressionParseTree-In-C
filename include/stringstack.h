@@ -28,7 +28,3 @@ void spPop();
 
 void spCleanup();
 void spDestroy();
-
-// Globals
-extern sPtr *spTop;
-extern bool ssCleanedUp;

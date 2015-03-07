@@ -1,16 +1,19 @@
 #include "lexer.h"
+
 #include <ctype.h>
 #include "stringstack.h"
+#include "memwrapper.h"
+
+static int lexerIndex;
+static lxStack *lexerStackTop = NULL;
+static char *inputString;
 
 // Globals
-int lexerIndex;
-lxStack *lexerStackTop = NULL;
-char *inputString;
 token (*lexerStates[])(char *, int *) = {&lexerDefaultState, &lexerNumberLiteralState, &lexerStringLiteralState};
 
 void initLexer(char *input){
     inputString = input;
-    lexerStackTop = (lxStack *)malloc(sizeof(lxStack));
+    lexerStackTop = (lxStack *)mwalloc(sizeof(lxStack));
     lexerStackTop->state = DEFAULT;
     lexerStackTop->prev = NULL;
 }
@@ -206,7 +209,7 @@ void exitState(){
 
 lxStack *lexerInitStack(){
 	// Allocate memory for the root element
-	lexerStackTop = (lxStack *)malloc(sizeof(lxStack));
+	lexerStackTop = (lxStack *)mwalloc(sizeof(lxStack));
 
 	// Initialize the lexer in the default state
 	lexerStackTop->state = DEFAULT;
@@ -229,7 +232,7 @@ void lexerDestroyStack(){
 		next = next->prev;
 
 		// Free allocated resources
-		free(destroy);
+		mwfree(destroy, sizeof(lxStack));
 	}
 
 	// Set the top element to NULL
@@ -238,7 +241,7 @@ void lexerDestroyStack(){
 
 void lexerPushStack(lxState state){
 	// Allocate memory for a new element
-	lxStack *next = (lxStack *)malloc(sizeof(lxStack));
+	lxStack *next = (lxStack *)mwalloc(sizeof(lxStack));
 
 	// Set the previous element to the current top element
 	next->prev = lexerStackTop;
@@ -257,7 +260,7 @@ lxState lexerPopStack(){
 	lxState ret = top->state;
 
 	// Free dynamically allocated memory
-	free(top);
+	mwfree(top, sizeof(lxStack));
 
 	// Return the state
 	return ret;

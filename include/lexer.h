@@ -48,7 +48,4 @@ bool lexerIgnoreWhitespace(int *index, token *t);
 void lexerCatchAll(int *index, token *t);
 
 // Globals
-extern int lexerIndex;
-extern lxStack *lexerStackTop;
-extern char *inputString;
 extern token (*lexerStates[])(char *, int *);
