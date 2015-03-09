@@ -23,4 +23,4 @@ The makefile currently also compiles the program with debug symbols. To disable 
 - [ ] Other stuff I haven't thought of
 
 ## Dynamic memory allocation and deallocation ##
-Since I'm extremely lazy, I'm just keeping track of memory allocated and deallocated with the functions in `memorywrapper.h` until something bad happens. 
+Since I'm extremely lazy, I'm just keeping track of memory allocated and deallocated with the functions in `memwrapper.h` until something bad happens. 
