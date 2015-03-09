@@ -52,3 +52,4 @@ typedef struct token{
 
 void tokenCopy(token *src, token *dest);
 bool isTerminal(tokenType t);
+bool isTerminalStrict(tokenType t);

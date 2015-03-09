@@ -32,4 +32,4 @@ void parserDisplayFirstSet();
 void parserDisplayFollowSet();
 void parserDisplayPredictTable();
 
-bool parserOk();
+bool parserGenOk();

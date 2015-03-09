@@ -12,7 +12,7 @@ int parserPredictTable[TOKEN_N][TOKEN_N] = {{-1}};
 
 static bool parserStateOk = true;
 
-bool parserOk(){
+bool parserGenOk(){
 	return parserStateOk;
 }
 
@@ -219,7 +219,7 @@ void parserGeneratePredictTable(){
 	}
 
 	for(int i = 0; i < RULE_N; i++){
-		for(int j = 0; j < CHAR_NUL; j++){
+		for(int j = 0; j <= CHAR_NUL; j++){
 			int k = 0;
 			if(parserFirstSet[parserRules[i].expr[k]][j]){
 				if(parserPredictTable[parserRules[i].goal][j] != i && parserPredictTable[parserRules[i].goal][j] != -1 && parserPredictTable[parserRules[i].goal][j] < RULE_N){
@@ -338,7 +338,7 @@ void parserDisplayPredictTable(){
 		printf("\n");
 
 		printf("              "); // 14
-		for(int j = 0; j + i * COL < CHAR_NUL && j < COL; j++){
+		for(int j = 0; j + i * COL <= CHAR_NUL && j < COL; j++){
 			// Header
 			printf("%17s ", tokenTypeName[j + i * COL + 1]);
 		}
@@ -349,7 +349,7 @@ void parserDisplayPredictTable(){
 			printf("%13s ", tokenTypeName[j + 1]);
 
 			// Columns
-			for(int k = 0; k + i * COL < CHAR_NUL && k < COL; k++){
+			for(int k = 0; k + i * COL <= CHAR_NUL && k < COL; k++){
 				if(parserPredictTable[j][k + i * COL] != -1){
 					printf("         Rule #%02d ", parserPredictTable[j][k + i * COL]);
 				} else {

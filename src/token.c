@@ -46,3 +46,7 @@ const char *tokenTypeName[] = {
 bool isTerminal(tokenType t){
 	return t <= CHAR_NUL;
 }
+
+bool isTerminalStrict(tokenType t){
+	return t < CHAR_NUL;
+}

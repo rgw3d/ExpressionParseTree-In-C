@@ -30,7 +30,7 @@ void *mwrealloc(void *ptr, size_t origSz, size_t sz){
 		printf("[MWRAP] Reallocated %4zd bytes at %p to %4zd bytes at %p\n", origSz, ptr, sz, newPtr);
 	}
 
-	return ptr;
+	return newPtr;
 }
 
 void *mwalloc(size_t sz){

@@ -10,7 +10,7 @@ CDEBUG = -g
 CFLAGS = $(CDEBUG) -I. -I$(includedir) -I$(srcdir) -Wall -std=c11
 INCLUDE =
 
-_DEPS = lexer.h token.h parser.h parsergen.h stringstack.h input.h buildinfo.h memwrapper.h
+_DEPS = lexer.h token.h parser.h parsergen.h stringstack.h input.h buildinfo.h memwrapper.h ptrstack.h
 DEPS = $(patsubst %,$(includedir)/%,$(_DEPS))
 
 _SRCS = main.c $(_DEPS:.h=.c)

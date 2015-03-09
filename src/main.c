@@ -6,9 +6,11 @@
 #include "input.h"
 #include "memwrapper.h"
 #include "parsergen.h"
+#include "parser.h"
 
 void init(){
 	spInit();
+	parserInit();
 	parserInitTables();
 	parserInitRules();
 	parserGenerateFirstSet();
@@ -18,6 +20,7 @@ void init(){
 
 // Deallocate all dynamically memory
 void cleanup(){
+	parseTreeDestroy();
 	deinitLexer();
 	ssCleanup();
 	spCleanup();
@@ -49,7 +52,10 @@ int main(int argc, const char *argv[]){
 		// Input not truncated and is not empty
 		initLexer(input);
 
-		token t;
+		if(parserGenOk()){
+			parseTreeNode *root = parserExec();
+		}
+		/*token t;
 		printf("        %-17s %-20s\n", "Token Type", "Token Value");
 		do{
 			t = lexerNext();
@@ -67,7 +73,7 @@ int main(int argc, const char *argv[]){
 			printf("[press enter]");
 			//printf("\n");
 			getchar();
-		} while(t.type != ERROR && t.type != CHAR_NUL);
+		} while(t.type != ERROR && t.type != CHAR_NUL);*/
 	}
 
 	memstat();
