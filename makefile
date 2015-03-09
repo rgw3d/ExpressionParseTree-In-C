@@ -42,7 +42,7 @@ buildinfo.o:
 #	$(CC) $(CFLAGS) $(INCLUDE) -c -o $(objdir)/$*.o $(srcdir)/$*.c
 	$(CC) $(CFLAGS) -c -o $(objdir)/$*.o $(srcdir)/$*.c
 	
-$(objdir.c)/%.o: $(srcdir)/%.c
+$(objdir)/%.o: $(srcdir)/%.c
 #	$(CC) $(CFLAGS) $(INCLUDE) -c -o $(objdir)/$*.o $(srcdir)/$*.c
 	$(CC) $(CFLAGS) -c -o $(objdir)/$*.o $(srcdir)/$*.c
 
