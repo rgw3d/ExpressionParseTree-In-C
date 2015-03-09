@@ -19,6 +19,12 @@ SRCS = $(patsubst %,$(srcdir)/%,$(_SRCS))
 _OBJS = $(_SRCS:.c=.o)
 OBJS = $(patsubst %,$(objdir)/%,$(_OBJS))
 
+.PHONY: all
+all: obj main.exe
+	
+obj:
+	mkdir obj
+
 buildinfo.o:
 	@echo "Generating build info..."
 	@echo $(shell git log -1 --abbrev-commit --pretty=oneline)
@@ -36,16 +42,14 @@ buildinfo.o:
 #	$(CC) $(CFLAGS) $(INCLUDE) -c -o $(objdir)/$*.o $(srcdir)/$*.c
 	$(CC) $(CFLAGS) -c -o $(objdir)/$*.o $(srcdir)/$*.c
 	
-%.o:
+$(objdir.c)/%.o: $(srcdir)/%.c
 #	$(CC) $(CFLAGS) $(INCLUDE) -c -o $(objdir)/$*.o $(srcdir)/$*.c
 	$(CC) $(CFLAGS) -c -o $(objdir)/$*.o $(srcdir)/$*.c
 
-main.exe: $(_OBJS)
+main.exe: $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LIBS)
-	
-.PHONY: all
-all: main.exe
 	
 .PHONY: clean
 clean:
 	rm -f $(objdir)/*.o main.exe core *.core
+	rm -r obj
