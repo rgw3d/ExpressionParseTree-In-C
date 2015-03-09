@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 
+void *mwrealloc(void *ptr, size_t origSz, size_t sz);
 void *mwalloc(size_t sz);
 void mwfree(void *ptr, size_t sz);
 

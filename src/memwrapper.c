@@ -10,6 +10,29 @@ static size_t totalAllocated = 0;
 static size_t totalDeallocated = 0;
 static size_t peakAllocated = 0;
 
+void *mwrealloc(void *ptr, size_t origSz, size_t sz){
+	void *newPtr = realloc(ptr, sz);
+
+	size_t diff = sz - origSz;
+	if(diff > 0){
+		totalDeallocated -= diff;
+	} else {
+		totalAllocated += diff;
+	}
+
+	netAllocated += diff;
+
+	if(peakAllocated < netAllocated){
+		peakAllocated = netAllocated;
+	}
+
+	if(PRINT_MEM_DEBUG_MSGS){
+		printf("[MWRAP] Reallocated %4zd bytes at %p to %4zd bytes at %p\n", origSz, ptr, sz, newPtr);
+	}
+
+	return ptr;
+}
+
 void *mwalloc(size_t sz){
 	netAllocated += sz;
 	totalAllocated += sz;
