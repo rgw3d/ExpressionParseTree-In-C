@@ -1,12 +1,13 @@
 #pragma once
 
-#include "token.h"
 #include <stdbool.h>
+
+#include "token.h"
 
 #define EXPR_N 3
 #define RULE_N 31
 
-typedef struct parserRule{
+typedef struct parserRule {
 	tokenType goal;
 	tokenType expr[EXPR_N];
 } parserRule;
@@ -18,7 +19,8 @@ extern int parserPredictTable[TOKEN_N][TOKEN_N];
 
 void parserInitTables();
 void parserInitRules();
-void parserAddRule(int index, tokenType goal, tokenType e0, tokenType e1, tokenType e2);
+void parserAddRule(int index, tokenType goal, tokenType e0, tokenType e1,
+		tokenType e2);
 void parserGenerateFirstSet();
 void parserGenerateFollowSet();
 void parserGeneratePredictTable();

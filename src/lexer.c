@@ -1,105 +1,111 @@
-#include "lexer.h"
-
 #include <ctype.h>
-#include "stringstack.h"
-#include "memwrapper.h"
+#include <lexer.h>
+#include <memwrapper.h>
+#include <stringstack.h>
 
 static int lexerIndex;
 static lxStack *lexerStackTop = NULL;
 static char *inputString;
 
-// Globals
-token (*lexerStates[])(char *, int *) = {&lexerDefaultState, &lexerNumberLiteralState, &lexerStringLiteralState};
+static const char *lxStateName[] = { "DEFAULT", "NUMBER", "STRING" };
 
-void initLexer(char *input){
-    inputString = input;
-    lexerStackTop = (lxStack *)mwalloc(sizeof(lxStack));
-    lexerStackTop->state = DEFAULT;
-    lexerStackTop->prev = NULL;
+// Globals
+token (*lexerStates[])(char *,
+		int *) = {&lexerDefaultState, &lexerNumberLiteralState, &lexerStringLiteralState
+		};
+
+const char *lexerStateName(lxState state) {
+	return lxStateName[state + 1];
 }
 
-void deinitLexer(){
+void initLexer(char *input) {
+	inputString = input;
+	lexerStackTop = (lxStack *) mwalloc(sizeof(lxStack));
+	lexerStackTop->state = DEFAULT;
+	lexerStackTop->prev = NULL;
+}
+
+void deinitLexer() {
 	lexerDestroyStack();
 }
 
-token lexerPeek(){
+token lexerPeek() {
 	int initIndex = lexerIndex;
 	token ret = lexerNext();
 	lexerIndex = initIndex;
 	return ret;
 }
 
-token lexerNext(){
-    return lexerStates[lexerState()](inputString, &lexerIndex);
+token lexerNext() {
+	return lexerStates[lexerState()](inputString, &lexerIndex);
 }
 
-token lexerDefaultState(char *input, int *index){
+token lexerDefaultState(char *input, int *index) {
 	token t;
 	t.type = ERROR;
 	t.value = NULL;
 
 	lxDefaultStart:
-		// Goto start if next character is a whitespace
-		if(lexerIgnoreWhitespace(index, &t)) goto lxDefaultStart;
+	// Goto start if next character is a whitespace
+	if (lexerIgnoreWhitespace(index, &t))
+		goto lxDefaultStart;
 
-		// Check if is character is string or if is number
-		if(isdigit((int)input[*index])){
-			// Continue the lexer in a different state
-			return enterState(NUMBER);
-		} else if(isalpha((int)input[*index])){
-			// Continue the lexer in a different state
-			return enterState(STRING);
-		}
+	// Check if is character is string or if is number
+	if (isdigit((int )input[*index])) {
+		// Continue the lexer in a different state
+		return enterState(NUMBER);
+	} else if (isalpha((int )input[*index])) {
+		// Continue the lexer in a different state
+		return enterState(STRING);
+	}
 
-		switch(input[*index]){
-			case '+':
-				t.type = SYMBOL_PLUS;
-				goto lxDefaultSymbolEnd;
-			case '-':
-				t.type = SYMBOL_MINUS;
-				goto lxDefaultSymbolEnd;
-			case '*':
-				t.type = SYMBOL_MULTIPLY;
-				goto lxDefaultSymbolEnd;
-			case '/':
-				t.type = SYMBOL_DIVIDE;
-				goto lxDefaultSymbolEnd;
-			case '=':
-				t.type = SYMBOL_EQUAL;
-				goto lxDefaultSymbolEnd;
-			case '(':
-				t.type = SYMBOL_LPAREN;
-				goto lxDefaultSymbolEnd;
-			case ')':
-				t.type = SYMBOL_RPAREN;
-				goto lxDefaultSymbolEnd;
-			case '[':
-				t.type = SYMBOL_LSBRACKET;
-				goto lxDefaultSymbolEnd;
-			case ']':
-				t.type = SYMBOL_RSBRACKET;
-				goto lxDefaultSymbolEnd;
-			case '{':
-				t.type = SYMBOL_LCBRACKET;
-				goto lxDefaultSymbolEnd;
-			case '}':
-				t.type = SYMBOL_RCBRACKET;
-				goto lxDefaultSymbolEnd;
-		}
+	switch (input[*index]) {
+	case '+':
+		t.type = SYMBOL_PLUS;
+		goto lxDefaultSymbolEnd;
+	case '-':
+		t.type = SYMBOL_MINUS;
+		goto lxDefaultSymbolEnd;
+	case '*':
+		t.type = SYMBOL_MULTIPLY;
+		goto lxDefaultSymbolEnd;
+	case '/':
+		t.type = SYMBOL_DIVIDE;
+		goto lxDefaultSymbolEnd;
+	case '=':
+		t.type = SYMBOL_EQUAL;
+		goto lxDefaultSymbolEnd;
+	case '(':
+		t.type = SYMBOL_LPAREN;
+		goto lxDefaultSymbolEnd;
+	case ')':
+		t.type = SYMBOL_RPAREN;
+		goto lxDefaultSymbolEnd;
+	case '[':
+		t.type = SYMBOL_LSBRACKET;
+		goto lxDefaultSymbolEnd;
+	case ']':
+		t.type = SYMBOL_RSBRACKET;
+		goto lxDefaultSymbolEnd;
+	case '{':
+		t.type = SYMBOL_LCBRACKET;
+		goto lxDefaultSymbolEnd;
+	case '}':
+		t.type = SYMBOL_RCBRACKET;
+		goto lxDefaultSymbolEnd;
+	}
 
-		lexerCatchAll(index, &t);
+	lexerCatchAll(index, &t);
 
-		goto lxDefaultEnd;
+	goto lxDefaultEnd;
 
-		// Found symbol
-	lxDefaultSymbolEnd:
-		(*index)++; // Advance index
+	// Found symbol
+	lxDefaultSymbolEnd: (*index)++; // Advance index
 
-	lxDefaultEnd:
-		return t;
+	lxDefaultEnd: return t;
 }
 
-token lexerNumberLiteralState(char *input, int *index){
+token lexerNumberLiteralState(char *input, int *index) {
 	int startIndex = *index;
 	token t;
 	t.type = LITERAL_INT;
@@ -108,67 +114,68 @@ token lexerNumberLiteralState(char *input, int *index){
 	// Create new string
 	ssChar *top = NULL;
 
-	lxNumberStart:
-		if(isdigit((int)input[*index]) || ((t.type == LITERAL_HEX || t.type == LITERAL_FLOAT_HEX) && isxdigit((int)input[*index]))){
-			top = ssPush(input[*index], top); // Push character to stack
-			(*index)++;
-			goto lxNumberStart;
-		}
+	lxNumberStart: if (isdigit((int )input[*index])
+			|| ((t.type == LITERAL_HEX || t.type == LITERAL_FLOAT_HEX)
+					&& isxdigit((int )input[*index]))) {
+		top = ssPush(input[*index], top); // Push character to stack
+		(*index)++;
+		goto lxNumberStart;
+	}
 
-		if(input[*index] == 'x' || input[*index] == 'X'){
-			if(input[startIndex] == '0' && *index == startIndex + 1){
-				top = ssPush(input[*index], top); // Push character to stack
-				(*index)++; // Advance index
-				// Set token type to hex literal
-				t.type = LITERAL_HEX;
-				goto lxNumberStart;
-			} else {
-				// Unexpected character, stop token here
-				goto lxNumberEnd;
-			}
-		}
-
-		if(input[*index] == '.'){
-			// Unexpected character, stop token here
-			if(t.type == LITERAL_FLOAT_HEX || t.type == LITERAL_FLOAT){
-				goto lxNumberEnd;
-			}
-
+	if (input[*index] == 'x' || input[*index] == 'X') {
+		if (input[startIndex] == '0' && *index == startIndex + 1) {
 			top = ssPush(input[*index], top); // Push character to stack
 			(*index)++; // Advance index
-
-			// Set token type to float
-			if(t.type == LITERAL_HEX){
-				t.type = LITERAL_FLOAT_HEX;
-			} else {
-				t.type = LITERAL_FLOAT;
-			}
+			// Set token type to hex literal
+			t.type = LITERAL_HEX;
 			goto lxNumberStart;
+		} else {
+			// Unexpected character, stop token here
+			goto lxNumberEnd;
+		}
+	}
+
+	if (input[*index] == '.') {
+		// Unexpected character, stop token here
+		if (t.type == LITERAL_FLOAT_HEX || t.type == LITERAL_FLOAT) {
+			goto lxNumberEnd;
 		}
 
-		if(input[*index] == ','){
-			// Discard
-			(*index)++;
-			goto lxNumberStart;
-		}
+		top = ssPush(input[*index], top); // Push character to stack
+		(*index)++; // Advance index
 
-		// Exit state if unmatched
+		// Set token type to float
+		if (t.type == LITERAL_HEX) {
+			t.type = LITERAL_FLOAT_HEX;
+		} else {
+			t.type = LITERAL_FLOAT;
+		}
+		goto lxNumberStart;
+	}
+
+	if (input[*index] == ',') {
+		// Discard
+		(*index)++;
+		goto lxNumberStart;
+	}
+
+	// Exit state if unmatched
 	lxNumberEnd:
-		// Create string, this string will be deallocated by ssCleanup called in cleanup in main.c
-		if(top != NULL){
-			t.value = ssStr(top);
-		}
+	// Create string, this string will be deallocated by ssCleanup called in cleanup in main.c
+	if (top != NULL) {
+		t.value = ssStr(top);
+	}
 
-		// Deallocate stack
-		ssDestroy(top);
+	// Deallocate stack
+	ssDestroy(top);
 
-		// Exit state
-		exitState();
+	// Exit state
+	exitState();
 
 	return t;
 }
 
-token lexerStringLiteralState(char *input, int *index){
+token lexerStringLiteralState(char *input, int *index) {
 	token t;
 	t.type = LITERAL_STRING;
 	t.value = NULL;
@@ -176,40 +183,39 @@ token lexerStringLiteralState(char *input, int *index){
 	// Create new string
 	ssChar *top = NULL;
 
-	lxStringStart:
-		if(isalpha((int)input[*index]) || input[*index] == '_'){
-			top = ssPush(input[*index], top); // Push character to stack
-			(*index)++; // Advance index
-			goto lxStringStart;
-		}
+	lxStringStart: if (isalpha((int)input[*index]) || input[*index] == '_') {
+		top = ssPush(input[*index], top); // Push character to stack
+		(*index)++; // Advance index
+		goto lxStringStart;
+	}
 
-		// Exit state if unmatched
+	// Exit state if unmatched
 //	lxStringEnd:
-		// Create string, this string will be deallocated by ssCleanup called in cleanup in main.c
-		if(top != NULL){
-			t.value = ssStr(top);
-		}
+	// Create string, this string will be deallocated by ssCleanup called in cleanup in main.c
+	if (top != NULL) {
+		t.value = ssStr(top);
+	}
 
-		// Deallocate stack
-		ssDestroy(top);
+	// Deallocate stack
+	ssDestroy(top);
 
-		// Exit state
-		exitState();
+	// Exit state
+	exitState();
 	return t;
 }
 
-token enterState(lxState state){
+token enterState(lxState state) {
 	lexerPushStack(state);
-    return lexerNext();
+	return lexerNext();
 }
 
-void exitState(){
+void exitState() {
 	lexerPopStack();
 }
 
-lxStack *lexerInitStack(){
+lxStack *lexerInitStack() {
 	// Allocate memory for the root element
-	lexerStackTop = (lxStack *)mwalloc(sizeof(lxStack));
+	lexerStackTop = (lxStack *) mwalloc(sizeof(lxStack));
 
 	// Initialize the lexer in the default state
 	lexerStackTop->state = DEFAULT;
@@ -221,10 +227,10 @@ lxStack *lexerInitStack(){
 	return lexerStackTop;
 }
 
-void lexerDestroyStack(){
+void lexerDestroyStack() {
 	lxStack *next = lexerStackTop;
 	// While there are still elements to visit
-	while(next != NULL){
+	while (next != NULL) {
 		// Get the element to destroy
 		lxStack *destroy = next;
 
@@ -239,9 +245,9 @@ void lexerDestroyStack(){
 	lexerStackTop = NULL;
 }
 
-void lexerPushStack(lxState state){
+void lexerPushStack(lxState state) {
 	// Allocate memory for a new element
-	lxStack *next = (lxStack *)mwalloc(sizeof(lxStack));
+	lxStack *next = (lxStack *) mwalloc(sizeof(lxStack));
 
 	// Set the previous element to the current top element
 	next->prev = lexerStackTop;
@@ -251,7 +257,7 @@ void lexerPushStack(lxState state){
 	lexerStackTop = next;
 }
 
-lxState lexerPopStack(){
+lxState lexerPopStack() {
 	// Replace top element with the one before it
 	lxStack *top = lexerStackTop;
 	lexerStackTop = top->prev;
@@ -266,37 +272,37 @@ lxState lexerPopStack(){
 	return ret;
 }
 
-lxState lexerState(){
+lxState lexerState() {
 	// Return the state stored in the top element of the stack
 	return lexerStackTop->state;
 }
 
-bool lexerIgnoreWhitespace(int *index, token *t){
-	switch(inputString[*index]){
-		case ' ':
-		case '\n':
-		case '\r':
-		case '\t':
-		case '\v':
-		case '\f':
-			// Ignore these whitespace characters
-			(*index)++;
-			return true;
+bool lexerIgnoreWhitespace(int *index, token *t) {
+	switch (inputString[*index]) {
+	case ' ':
+	case '\n':
+	case '\r':
+	case '\t':
+	case '\v':
+	case '\f':
+		// Ignore these whitespace characters
+		(*index)++;
+		return true;
 	}
 	return false;
 }
 
-void lexerCatchAll(int *index, token *t){
-	switch(inputString[*index]){
-		case '\0':
-			// Input has ended
-			t->type = CHAR_NUL;
-			(*index)++;
-			break;
-		default:
-			// Unexpected characters
-			t->type = ERROR;
-			t->value = &inputString[*index];
-			(*index)++;
+void lexerCatchAll(int *index, token *t) {
+	switch (inputString[*index]) {
+	case '\0':
+		// Input has ended
+		t->type = CHAR_NUL;
+		(*index)++;
+		break;
+	default:
+		// Unexpected characters
+		t->type = ERROR;
+		t->value = &inputString[*index];
+		(*index)++;
 	}
 }
