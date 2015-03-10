@@ -23,8 +23,16 @@ automake -a
 make
 ```
 
-Outputs to `exptr`. Requires a C99 compatible C compiler.
+Outputs to `exptr`. Requires a C99 compatible C compiler. If you get an error about missing a `m4` directory, simply run `mkdir m4`. Too lazy to include it in the repo cuz I'm lazy.
 
+To delete the compiled `.o` object files and executable files, run `make clean`.
+
+To change where the program is built, simply run the `configure` script from another folder. For example:
+```sh
+cd build
+../configure
+make
+```
 
 ## Debugging ##
 To debug the program run the following commands:
@@ -35,11 +43,21 @@ make
 
 For more information on `gdb`, read the [official documentation](http://www.gnu.org/software/gdb/documentation/).
 
+## Documentation ##
+To generate documentation from comments in the source code, run the following command:
+```sh
+doxygen ExpressionParseTree-In-C.doxyfile
+```
+
+Requires [doxygen](http://www.stack.nl/~dimitri/doxygen/index.html). The generate documentation can be found in the folder `doc/`.
+
 ## Implementation State ##
 - [x] Lexer
 - [x] Parser gen
 - [x] Parser
 - [ ] Verify/test parser output
+- [ ] Generate dot files for parser output
+- [ ] Document code
 - [ ] Other stuff I haven't thought of
 
 ## Dynamic memory allocation and deallocation ##
