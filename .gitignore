@@ -62,3 +62,6 @@ config.status
 makefile
 
 /src/.deps
+
+# Doxygen
+doc/
