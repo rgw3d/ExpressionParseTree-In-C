@@ -3,24 +3,34 @@ ExpressionParseTree-In-C
 
 Same goal as ExpressionParseTreeV2, but I'm writing it in C now. Pointers are my friend
 
+## Installing ##
+To install this program run the following commands:
+```sh
+./configure
+make
+make install
+```
+
 ## Building ##
-To build this program run the following commands:
+To build this program from the repo run the following commands:
 ```sh
 git clone https://github.com/rgw3d/ExpressionParseTree-In-C.git
 cd ExpressionParseTree-In-C
+aclocal
+autoconf
+automake -a
+./configure
 make
-./main.exe
 ```
 
-It's currently outputting to `main.exe` because I'm lazy. Currently requires `gcc 4.6+`. To get it to work with other C11 compatible compilers (`clang 3.1+`, etc), edit the makefile.
+Outputs to `exptr`. Requires a C99 compatible C compiler.
 
 
 ## Debugging ##
-The makefile currently compiles the program with debug symbols. To disable this, remove the `-g` flag in the makefile.
-
-To debug the program run:
+To debug the program run the following commands:
 ```sh
-gdb main.exe
+./configure --enable-debug
+make
 ```
 
 For more information on `gdb`, read the [official documentation](http://www.gnu.org/software/gdb/documentation/).
