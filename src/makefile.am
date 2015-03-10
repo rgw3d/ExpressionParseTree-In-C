@@ -1,0 +1,5 @@
+AM_CFLAGS = -I$(top_srcdir)/include @AM_CFLAGS@
+
+bin_PROGRAMS = exptr
+
+exptr_SOURCES = input.c lexer.c main.c memwrapper.c parser.c parsergen.c ptrstack.c stringstack.c token.c 
