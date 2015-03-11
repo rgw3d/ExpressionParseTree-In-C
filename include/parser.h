@@ -12,16 +12,15 @@
  * forever and causes a memory leak or SIGSEGV.
  */
 typedef struct parseTreeNode {
-	struct parseTreeNode *parent;     ///< points to the parent node.
-	tokenType type;					  ///< the type of the node.
-	char *value;					  ///< the pointer to the value of the node,
-									  ///< if any. This will be set to NULL if
-									  ///< the node does not have any value.
-	parserRule *rule;				  ///< the parser rule that was applied to
-									  ///< this node.
-	int childCount;					  ///< the count of the children of the
-									  ///< node.
-	struct parseTreeNode *children[]; ///< pointers to the children of the node.
+	struct parseTreeNode *parent;    //!< points to the parent node.
+	tokenType type;					 //!< the type of the node.
+	char *value;					 //!< the pointer to the value of the node,
+									 //!< if any. This will be set to NULL if
+									 //!< the node does not have any value.
+	parserRule *rule;				 //!< the parser rule that was applied to
+									 //!< this node.
+	int childCount;					 //!< the count of the children of the node.
+	struct parseTreeNode *children[];//!< pointers to the children of the node.
 } parseTreeNode;
 
 /**

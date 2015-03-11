@@ -102,7 +102,9 @@ void parserGenerateFirstSet() {
 	do {
 		setChanged = false;
 
+		// For each token
 		for (int i = 0; i < TOKEN_N; i++) {
+			// That is not a terminal
 			if (!isTerminal(i)) {
 				bool allHasEpsilon = true;
 				for (int j = 0; j < RULE_N; j++) {
@@ -230,7 +232,7 @@ void parserGenerateFollowSet() {
 			printf("[PSGEN] Follow set generation exceeded maximum passes!\n");
 			parserStateOk = false;
 		}
-	} while (setChanged);
+	} while (setChanged); // Run until all the sets stay the same
 }
 
 void parserGeneratePredictTable() {
@@ -238,9 +240,12 @@ void parserGeneratePredictTable() {
 		printf("[PSGEN] Generating parse table.\n");
 	}
 
+	// For each rule A -> t
 	for (int i = 0; i < RULE_N; i++) {
+		// For each terminal a
 		for (int j = 0; j <= CHAR_NUL; j++) {
 			int k = 0;
+			// a is int Fi(t)
 			if (parserFirstSet[parserRules[i].expr[k]][j]) {
 				if (parserPredictTable[parserRules[i].goal][j]
 						!= i&& parserPredictTable[parserRules[i].goal][j] != -1 && parserPredictTable[parserRules[i].goal][j] < RULE_N) {
@@ -255,9 +260,11 @@ void parserGeneratePredictTable() {
 					parserStateOk = false;
 					goto endGeneratePredictTable;
 				}
+				// Add rule to table
 				parserPredictTable[parserRules[i].goal][j] = i;
 			}
 
+			// epsilon is in Fi(t) and a is in Fo(t)
 			if (parserSetHasEpsilon(
 					parserFirstSet[parserRules[i].expr[k]]) && parserFollowSet[parserRules[i].goal][j] && parserPredictTable[parserRules[i].goal][j] < RULE_N) {
 				if (parserPredictTable[parserRules[i].goal][j] != i
@@ -273,6 +280,7 @@ void parserGeneratePredictTable() {
 					parserStateOk = false;
 					goto endGeneratePredictTable;
 				}
+				// Add rule to table
 				parserPredictTable[parserRules[i].goal][j] = i;
 			}
 		}
@@ -365,7 +373,7 @@ void parserDisplayFollowSet() {
 }
 
 void parserDisplayPredictTable() {
-	const int COL = 10;
+	const int COL = PARSER_GEN_PRINT_COLS;
 	for (int i = 0; i <= CHAR_NUL / COL; i++) {
 		printf("[PSGEN] Parse table page %d out of %d\n", i + 1,
 				CHAR_NUL / COL + 1);

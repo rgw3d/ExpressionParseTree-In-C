@@ -14,6 +14,7 @@ void parserInit() {
 }
 
 void parseTreeCreateRoot() {
+	// Create the root node of the parse tree
 	root = (parseTreeNode *) mwalloc(sizeof(parseTreeNode));
 	root->parent = NULL;
 	root->type = SYM_S;
@@ -35,6 +36,7 @@ void parseTreeCreateNode(parseTreeNode *parent, int index, tokenType type) {
 		return;
 	}
 
+	// Allocate memory for the child and set default values
 	parseTreeNode *c = parent->children[index] = (parseTreeNode *) mwalloc(
 			sizeof(parseTreeNode));
 	c->parent = parent;
@@ -69,16 +71,19 @@ parseTreeNode *parseTreeApplyRule(parseTreeNode *node, parserRule *rule) {
 		return node;
 	}
 
+	// Update child count
+	node->childCount = sz;
+
 	for (int i = 0; i < sz; i++) {
+		// Create child nodes
 		parseTreeCreateNode(node, i, rule->expr[i]);
 	}
 
-	// Update child count
-	node->childCount = sz;
 	return node;
 }
 
 parseTreeNode *parseTreeNodeRealloc(parseTreeNode *node, int newChildCount) {
+	// Saves the reference to the parent node
 	parseTreeNode *parent = node->parent;
 	int parIndex = -1;
 
@@ -88,6 +93,7 @@ parseTreeNode *parseTreeNodeRealloc(parseTreeNode *node, int newChildCount) {
 		return NULL;
 	}
 
+	// Get the position where the node is reference in the parent
 	if (parent != NULL) {
 		// Root node, no reference to update
 		for (int i = 0; i < parent->childCount; i++) {
@@ -106,6 +112,7 @@ parseTreeNode *parseTreeNodeRealloc(parseTreeNode *node, int newChildCount) {
 
 	int oldChildCount = node->childCount;
 
+	// Reallocate memory
 	parseTreeNode *ptr = (parseTreeNode *) mwrealloc(node,
 			sizeof(parseTreeNode) + sizeof(void *) * node->childCount,
 			sizeof(parseTreeNode) + sizeof(void *) * newChildCount);
@@ -129,11 +136,14 @@ parseTreeNode *parseTreeNodeRealloc(parseTreeNode *node, int newChildCount) {
 	// Update child count
 	ptr->childCount = newChildCount;
 
+	// Return new pointer to the node
 	return ptr;
 }
 
 void parseTreeCopyValue(parseTreeNode *node, char* str) {
-	node->value = str; // Too lazy to create another copy
+	node->value = str;
+	// Should not create another copy since generated strings will be
+	// deallocated at the end of the program.
 }
 
 bool parserOk() {
@@ -141,16 +151,19 @@ bool parserOk() {
 }
 
 void parseTreeDestroy() {
+	// Creates a stack to store references to child nodes.
 	pNode *topElement = stackCreateNode();
 	pNode **top = &topElement;
+	// Push the root node to the stack
 	stackPush(top, root);
 
+	// While the stack is not empty
 	while (topElement->p != NULL) {
 		// Pop stack
 		parseTreeNode *next = (parseTreeNode *) topElement->p;
 		stackPop(top);
 
-		// Add children
+		// Add children to the stack
 		for (int i = 0; i < next->childCount && next->children != NULL; i++) {
 			if (next->children[i] != NULL) {
 				stackPush(top, next->children[i]);
@@ -163,12 +176,15 @@ void parseTreeDestroy() {
 						+ sizeof(parseTreeNode *) * next->childCount);
 	}
 
-	// Destroy stack
+	// Destroy stack used to track child nodes
 	stackDestroy(top);
+	// Free stack root
 	mwfree(topElement, sizeof(pNode));
 }
 
 parseTreeNode *parserExec() {
+	// Create the parser stack, this will store the symbol that is expected from
+	// the input.
 	pNode *topElement = stackCreateNode();
 	pNode **top = &topElement;
 
@@ -176,6 +192,7 @@ parseTreeNode *parserExec() {
 	stackPush(top, NULL); // End of input (CHAR_NUL)
 	stackPush(top, root);
 
+	// While the parser stack is not empty
 	while (!stackEmpty(top)) {
 		parseTreeNode *t = (parseTreeNode *) topElement->p;
 		token nextToken = lexerPeek();
@@ -189,6 +206,7 @@ parseTreeNode *parserExec() {
 		// Pop stack
 		stackPop(top);
 
+		// If the expected token is EPSILON (empty string), continue.
 		if (t->type == EPSILON) {
 			// Read nothing
 			if (PAUSE_PARSER_ON_STEP) {
@@ -212,8 +230,10 @@ parseTreeNode *parserExec() {
 				getchar();
 			}
 		} else {
+			// Otherwise check if the next expected token is a terminal.
 			if (isTerminal(t->type)) {
-				// If t is terminal or CHAR_NUL
+				// If t is terminal or CHAR_NUL and the next token in the input
+				// matches, then consume the token.
 				if (t->type == nextToken.type) {
 					// Read token
 					nextToken = lexerNext();
@@ -252,10 +272,12 @@ parseTreeNode *parserExec() {
 				}
 			} else {
 				// If t is non-terminal
+				// Then check whether any rules can be applied to the
+				// non-terminal based on the next token.
 				int rule = parserPredictTable[t->type][nextToken.type];
 
 				if (rule == -1) {
-					// Syntax error
+					// Syntax error if no rules match (table query yields -1)
 					// TODO: output error
 					parserStateOk = false;
 
@@ -282,7 +304,7 @@ parseTreeNode *parserExec() {
 
 					break;
 				} else {
-					// Apply rule
+					// Apply rule if a rule matches
 					bool isRoot = t == root;
 					t = parseTreeApplyRule(t, &parserRules[rule]);
 
@@ -291,7 +313,7 @@ parseTreeNode *parserExec() {
 						root = t;
 					}
 
-					// Push nodes in order
+					// Push the terminals or non-terminals in order on the stack
 					for (int i = t->childCount - 1; i >= 0; i--) {
 						if (t->children[i] == NULL) {
 							// Unexpected state
@@ -308,6 +330,7 @@ parseTreeNode *parserExec() {
 						stackPush(top, t->children[i]);
 					}
 
+					// Exit if an error occured
 					if (!parserStateOk) {
 						break;
 					}
@@ -344,14 +367,17 @@ parseTreeNode *parserExec() {
 		memstat();
 	}
 
+	// The parser has reached the bottom of the stack, entered an unexpected
+	// state or reached the end of input.
 	token nt = lexerPeek();
 	if (nt.type == CHAR_NUL && parserStateOk && stackEmpty(top)) {
-		// ACCEPT
+		// ACCEPT if the parser has reached the bottom of the stack and reached
+		// the end of the input.
 		if (PAUSE_PARSER_ON_STEP) {
 			printf("[PARSE] Input accepted\n");
 		}
 	} else {
-		// REJECT
+		// REJECT otherwise
 		if (PAUSE_PARSER_ON_STEP) {
 			printf("[PARSE] Input rejected\n");
 		}

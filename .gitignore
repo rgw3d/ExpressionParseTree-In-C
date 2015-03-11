@@ -54,7 +54,7 @@ makefile.in
 /install-sh
 /missing
 /include/stamp-h1
-/include/config.h
+/include/config.h*
 
 config.log
 config.status
@@ -62,6 +62,10 @@ config.status
 makefile
 
 /src/.deps
+
+# Misc directories
+/bin/
+/build/
 
 # Doxygen
 doc/

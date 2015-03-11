@@ -1,5 +1,4 @@
-#include "token.h"
-#include <stdlib.h>
+#include <token.h>
 
 void tokenCopy(token *src, token *dest){
 	dest->type = src->type;

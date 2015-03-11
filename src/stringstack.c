@@ -11,6 +11,7 @@ int ssLen(ssChar *top){
 
 	ssChar *prev = top->prev;
 	while(prev != NULL){
+		// While the current node actually exists
 		length++;
 		prev = prev->prev;
 	}
@@ -75,6 +76,7 @@ ssChar *ssRoot(ssChar *top){
 	ssChar *prev = top->prev;
 
 	while(prev->prev != NULL){
+		// While the current node is not the root node, get the previous one.
 		prev = prev->prev;
 	}
 
@@ -86,12 +88,15 @@ void ssDestroy(ssChar *top){
 	ssChar *prev = top;
 
 	while(prev != NULL){
+		// While the current node exists
 		prev = ssPop(prev);
 	}
 }
 
 // Pushes a character and return a pointer to the pushed element.
 void spPush(char *p){
+	// Set to false if something has been pushed on the stack
+	ssCleanedUp = false;
 	sPtr *e = (sPtr *)mwalloc(sizeof(sPtr));
 
 	e->prev = spTop;
@@ -141,8 +146,9 @@ void spCleanup(){
 void ssCleanup(){
 	sPtr *prev = spTop;
 
+	// While the current element exist
 	while(prev != NULL){
-		// Free memory
+		// Free memory if the pointer actually points to something
 		if(prev->p != NULL){
 			mwfree(prev->p, sizeof(char) * (strlen(prev->p) + 1));
 		}

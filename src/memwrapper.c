@@ -12,6 +12,7 @@ static size_t peakAllocated = 0;
 void *mwrealloc(void *ptr, size_t origSz, size_t sz) {
 	void *newPtr = realloc(ptr, sz);
 
+	// Update the memory counters
 	size_t diff = sz - origSz;
 	if (diff > 0) {
 		totalDeallocated -= diff;
@@ -34,6 +35,7 @@ void *mwrealloc(void *ptr, size_t origSz, size_t sz) {
 }
 
 void *mwalloc(size_t sz) {
+	// Update memory counters
 	netAllocated += sz;
 	totalAllocated += sz;
 
@@ -51,6 +53,7 @@ void *mwalloc(size_t sz) {
 }
 
 void mwfree(void *ptr, size_t sz) {
+	// Update memory counters
 	netAllocated -= sz;
 	totalDeallocated += sz;
 
@@ -75,7 +78,7 @@ size_t mwPeakAllocated() {
 }
 
 void memstat() {
-	if (PRINT_MEM_DEBUG_MSGS == 0) {
+	if (PRINT_MEM_DEBUG_MSGS == 0 || PRINT_MEM_STATS == 0) {
 		return;
 	}
 	printf("[MWRAP] Memory Statistics\n");

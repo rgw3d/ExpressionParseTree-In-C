@@ -12,31 +12,38 @@ static const char *lxStateName[] = { "DEFAULT", "NUMBER", "STRING" };
 // Globals
 token (*lexerStates[])(char *,
 		int *) = {&lexerDefaultState, &lexerNumberLiteralState, &lexerStringLiteralState
-		};
+};
 
 const char *lexerStateName(lxState state) {
-	return lxStateName[state + 1];
+	return lxStateName[state];
 }
 
 void initLexer(char *input) {
+	// Initializes the variables used by the lexical analyzer
 	inputString = input;
+	// Initializes the lexer state stack
 	lexerStackTop = (lxStack *) mwalloc(sizeof(lxStack));
 	lexerStackTop->state = DEFAULT;
 	lexerStackTop->prev = NULL;
 }
 
 void deinitLexer() {
+	// Deallocates the lexer state stack
 	lexerDestroyStack();
 }
 
 token lexerPeek() {
+	// Set the original index
 	int initIndex = lexerIndex;
+	// Read the next token
 	token ret = lexerNext();
+	// Restore the original index
 	lexerIndex = initIndex;
 	return ret;
 }
 
 token lexerNext() {
+	// Execute the lexer in the current lexer state and return the result.
 	return lexerStates[lexerState()](inputString, &lexerIndex);
 }
 
@@ -100,6 +107,7 @@ token lexerDefaultState(char *input, int *index) {
 	goto lxDefaultEnd;
 
 	// Found symbol
+	// Using labels and gotos to simplify stuff a bit
 	lxDefaultSymbolEnd: (*index)++; // Advance index
 
 	lxDefaultEnd: return t;
@@ -114,7 +122,11 @@ token lexerNumberLiteralState(char *input, int *index) {
 	// Create new string
 	ssChar *top = NULL;
 
-	lxNumberStart: if (isdigit((int )input[*index])
+	lxNumberStart:
+	// Check if the next character is a digit
+	// Casting the argument to ctype functions to int since the compiler will
+	// throw -Wchar-subscripts warning when compiling with -Wall.
+	if (isdigit((int )input[*index])
 			|| ((t.type == LITERAL_HEX || t.type == LITERAL_FLOAT_HEX)
 					&& isxdigit((int )input[*index]))) {
 		top = ssPush(input[*index], top); // Push character to stack
@@ -122,6 +134,7 @@ token lexerNumberLiteralState(char *input, int *index) {
 		goto lxNumberStart;
 	}
 
+	// Check if the processed number should be a in base 16
 	if (input[*index] == 'x' || input[*index] == 'X') {
 		if (input[startIndex] == '0' && *index == startIndex + 1) {
 			top = ssPush(input[*index], top); // Push character to stack
@@ -153,6 +166,7 @@ token lexerNumberLiteralState(char *input, int *index) {
 		goto lxNumberStart;
 	}
 
+	// Discard digit separators
 	if (input[*index] == ',') {
 		// Discard
 		(*index)++;
