@@ -51,13 +51,13 @@ doxygen ExpressionParseTree-In-C.doxyfile
 
 Requires [doxygen](http://www.stack.nl/~dimitri/doxygen/index.html). The generate documentation can be found in the folder `doc/`.
 
-## Implementation State ##
+## Implementation state ##
 - [x] Lexer
 - [x] Parser gen
 - [x] Parser
 - [ ] Verify/test parser output
 - [ ] Generate dot files for parser output
-- [ ] Document code
+- [x] Document code
 - [ ] Other stuff I haven't thought of
 
 ## Dynamic memory allocation and deallocation ##
