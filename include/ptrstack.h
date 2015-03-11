@@ -18,7 +18,7 @@ typedef struct pNode {
  */
 bool stackEmpty(pNode **top);
 /**
- * Destroys the entire stack. The top element if left untouched, it will have
+ * Destroys the entire stack. The top element is left untouched, it will have
  * to be deallocated manually with mwfree.
  *
  * @param top a pointer to the pointer to the top element of the stack.

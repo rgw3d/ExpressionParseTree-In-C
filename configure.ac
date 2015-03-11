@@ -21,6 +21,9 @@ AC_MSG_RESULT([$debugEnabled])
 if test x"$debugEnabled" = x"yes"; then
 	AC_DEFINE([DEBUG],[],[Debug Mode])
 	AM_CFLAGS="$AM_CFLAGS -g -Wall -O0"
+
+	# Select empty default
+	${CFLAGS=""}
 else
 	AC_DEFINE([NDEBUG],[],[No-debug Mode])
 	AM_CFLAGS="$AM_CFLAGS -O3"
@@ -35,7 +38,7 @@ AC_PROG_CC_C99
 # Checks for libraries.
 
 # Checks for header files.
-AC_CHECK_HEADERS([stdlib.h string.h])
+AC_CHECK_HEADERS([stdlib.h string.h stddef.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_CHECK_HEADER_STDBOOL

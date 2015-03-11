@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stringstack.h>
 #include <switches.h>
+#include <parsergraph.h>
 
 void init() {
 	spInit();
@@ -48,8 +49,9 @@ int main(int argc, const char *argv[]) {
 	//char input[1000];
 	//int ret = rdLine("> ", input, sizeof(input));
 	int ret = 0;
-	//char input[] = "1+2*(sin(0x1,532,bcf + 0.3)-[34+{12-0xbbc,3.163,b}-23]/21)-34,000";
-	char input[] = "1+2";
+	char input[] =
+			"1+2*(sin(0x1,532,bcf + 0.3)-[34+{12-0xbbc,3.163,b}-23]/21)-34,000";
+	//char input[] = "1+2";
 
 	if (ret == 0) {
 		// Input not truncated and is not empty
@@ -57,6 +59,10 @@ int main(int argc, const char *argv[]) {
 
 		if (parserGenOk()) {
 			parseTreeNode *root = parserExec();
+
+			if (parserOk()) {
+				parserGenerateDotFile(root);
+			}
 		}
 		/*token t;
 		 printf("        %-17s %-20s\n", "Token Type", "Token Value");

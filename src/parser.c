@@ -239,9 +239,10 @@ parseTreeNode *parserExec() {
 					nextToken = lexerNext();
 					t->value = nextToken.value;
 
-					if (PAUSE_PARSER_ON_STEP) {
-						printf("[PARSE] Read terminal token\n");
-					}
+					// Since nothing uses the parser output yet, outputting some
+					// stuff just to show that it's actually doing something.
+					printf("[PARSE] Consumed terminal token:       %s\n",
+							tokenTypeName[t->type + 1]);
 				} else {
 					// Unexpected token
 					// TODO: output error
@@ -335,9 +336,11 @@ parseTreeNode *parserExec() {
 						break;
 					}
 
-					if (PAUSE_PARSER_ON_STEP) {
+					if (PAUSE_PARSER_ON_STEP){
 						printf("[PARSE] Parser matched rule\n");
-						parserDisplayRule(rule);
+					}
+					parserDisplayRule(rule);
+					if (PAUSE_PARSER_ON_STEP) {
 						stackDump(top);
 						printf("[PARSE] Next token: %s ",
 								tokenTypeName[nextToken.type + 1]);

@@ -78,7 +78,7 @@ size_t mwPeakAllocated() {
 }
 
 void memstat() {
-	if (PRINT_MEM_DEBUG_MSGS == 0 || PRINT_MEM_STATS == 0) {
+	if (PRINT_MEM_DEBUG_MSGS == 0 && PRINT_MEM_STATS == 0) {
 		return;
 	}
 	printf("[MWRAP] Memory Statistics\n");

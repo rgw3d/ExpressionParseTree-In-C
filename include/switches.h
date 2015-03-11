@@ -13,12 +13,12 @@
 /**
  * Whether to print a message whenever memory has been allocated/deallocated.
  */
-#define PRINT_MEM_DEBUG_MSGS 1
+#define PRINT_MEM_DEBUG_MSGS 0
 
 /**
  * Whether to prompt for input when the parser processes a single token.
  */
-#define PAUSE_PARSER_ON_STEP 1
+#define PAUSE_PARSER_ON_STEP 0
 
 /**
  * Whether to print the generated sets and tables by the parser generator.

@@ -63,6 +63,8 @@ makefile
 
 /src/.deps
 
+configure.scan
+
 # Misc directories
 /bin/
 /build/
