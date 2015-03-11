@@ -35,9 +35,11 @@ int main(int argc, const char *argv[]) {
 
 	init();
 
-	parserDisplayFirstSet();
-	parserDisplayFollowSet();
-	parserDisplayPredictTable();
+	if(PRINT_PARSERGEN_DEBUG_MSGS){
+		parserDisplayFirstSet();
+		parserDisplayFollowSet();
+		parserDisplayPredictTable();
+	}
 
 	memstat();
 	if (MAIN_BREAK == 1) {
