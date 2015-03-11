@@ -16,9 +16,7 @@ To build this program from the repo run the following commands:
 ```sh
 git clone https://github.com/rgw3d/ExpressionParseTree-In-C.git
 cd ExpressionParseTree-In-C
-aclocal
-autoconf
-automake -a
+./autogen.sh
 ./configure
 make
 ```
@@ -33,6 +31,8 @@ cd build
 ../configure
 make
 ```
+
+If any changes were made to `configure.ac` or any `makefile.am`, you need to run `./autogen.sh` before building the program again.
 
 ## Debugging ##
 To debug the program run the following commands:
