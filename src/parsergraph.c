@@ -9,7 +9,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-void parserGenerateDotFile(parseTreeNode *root, const char * filename) {
+void parserGenerateDotFile(parseTreeNode *root, const char * filename, bool compressTerms) {
 	// Creates a stack to store references to child nodes.
 	pNode *topElement = stackCreateNode();
 	pNode **top = &topElement;
@@ -32,13 +32,28 @@ void parserGenerateDotFile(parseTreeNode *root, const char * filename) {
 		parseTreeNode *next = (parseTreeNode *) topElement->p;
 		stackPop(top);
 
+		bool fillTerm = false;
 		// Add node styles
 		fprintf(output, "  \"%016lX\" ", (uintptr_t)next);
-		if(next->value == NULL){
-			fprintf(output, "[shape=record label=\"{%s|0x%016lX}\" ", tokenTypeName[next->type + 1], (uintptr_t)next);
-		} else {
-			fprintf(output, "[shape=record label=\"{%s|0x%016lX}|%s\" ", tokenTypeName[next->type + 1], (uintptr_t)next, next->value);
+
+		fprintf(output, "[shape=record label=\"{%s|0x%016lX", tokenTypeName[next->type + 1], (uintptr_t)next);
+		if(next->childCount == 1 && compressTerms){
+			if(isTerminal(next->children[0]->type)){
+				fprintf(output, "|%s|0x%016lX", tokenTypeName[next->children[0]->type + 1], (uintptr_t)next->children[0]);
+				fillTerm = true;
+			}
 		}
+		fprintf(output, "}");
+		if(next->value != NULL){
+			fprintf(output, "|%s", next->value);
+		}
+
+		if(fillTerm){
+			if(next->children[0]->value != NULL){
+				fprintf(output, "|%s", next->children[0]->value);
+			}
+		}
+		fprintf(output, "\" ");
 
 		if(next->type == EPSILON){
 			fprintf(output, "fillcolor=lightgrey style=filled ");
@@ -48,7 +63,7 @@ void parserGenerateDotFile(parseTreeNode *root, const char * filename) {
 			fprintf(output, "fillcolor=lightred style=filled ");
 		}
 
-		if(isTerminalStrict(next->type)){
+		if(isTerminalStrict(next->type) || fillTerm){
 			fprintf(output, "fillcolor=lightblue style=filled ");
 		}
 
@@ -57,6 +72,9 @@ void parserGenerateDotFile(parseTreeNode *root, const char * filename) {
 		// Add children to the stack
 		for (int i = 0; i < next->childCount && next->children != NULL; i++) {
 			if (next->children[i] != NULL) {
+				if(isTerminal(next->children[i]->type) && next->childCount == 1 && compressTerms){
+					break; // Skip nodes with exactly one terminal child.
+				}
 				stackPush(top, next->children[i]);
 
 				// Add graph connection

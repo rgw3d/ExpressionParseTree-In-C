@@ -64,9 +64,11 @@ int main(int argc, const char *argv[]) {
 			parseTreeNode *root = parserExec();
 
 			if (parserOk()) {
-				parserGenerateDotFile(root, "parseTree.dot");
+				parserGenerateDotFile(root, "parseTree.dot", true);
+				parserGenerateDotFile(root, "parseTree.uncompressed.dot", false);
 				root = parseTreeDeallocateEpsilon(root);
-				parserGenerateDotFile(root, "prunedTree.dot");
+				parserGenerateDotFile(root, "prunedTree.dot", true);
+				parserGenerateDotFile(root, "prunedTree.uncompressed.dot", false);
 			}
 		}
 		/*token t;
