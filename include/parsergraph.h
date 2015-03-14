@@ -2,4 +2,4 @@
 
 #include "parser.h"
 
-void parserGenerateDotFile(parseTreeNode *root);
+void parserGenerateDotFile(parseTreeNode *root, const char *filename);

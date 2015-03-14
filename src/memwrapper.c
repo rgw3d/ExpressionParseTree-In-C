@@ -1,8 +1,9 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <switches.h>
 #include "memwrapper.h"
-#include "switches.h"
 
 static size_t netAllocated = 0;
 static size_t totalAllocated = 0;

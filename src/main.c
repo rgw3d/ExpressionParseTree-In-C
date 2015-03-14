@@ -6,6 +6,7 @@
 #include <stringstack.h>
 #include <switches.h>
 #include <parsergraph.h>
+#include <parserutil.h>
 
 void init() {
 	spInit();
@@ -63,7 +64,9 @@ int main(int argc, const char *argv[]) {
 			parseTreeNode *root = parserExec();
 
 			if (parserOk()) {
-				parserGenerateDotFile(root);
+				parserGenerateDotFile(root, "parseTree.dot");
+				root = parseTreeDeallocateEpsilon(root);
+				parserGenerateDotFile(root, "prunedTree.dot");
 			}
 		}
 		/*token t;

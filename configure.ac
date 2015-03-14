@@ -3,6 +3,9 @@
 
 AC_PREREQ([2.69])
 AC_INIT([ExpressionParseTree In C], [1.0], [https://github.com/rgw3d/ExpressionParseTree-In-C])
+
+ORIG_CFLAGS=$CFLAGS
+
 AC_CONFIG_SRCDIR([src/main.c])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([include/config.h])
@@ -22,8 +25,8 @@ if test x"$debugEnabled" = x"yes"; then
 	AC_DEFINE([DEBUG],[],[Debug Mode])
 	AM_CFLAGS="$AM_CFLAGS -g -Wall -O0"
 
-	# Select empty default
-	${CFLAGS=""}
+	# Reset compiler flags
+	CFLAGS=$ORIG_CFLAGS
 else
 	AC_DEFINE([NDEBUG],[],[No-debug Mode])
 	AM_CFLAGS="$AM_CFLAGS -O3"

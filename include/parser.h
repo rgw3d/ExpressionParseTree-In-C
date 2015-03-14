@@ -83,3 +83,12 @@ bool parserOk();
  */
 parseTreeNode *parserExec();
 
+/**
+ * Deallocate branch and reset references to the node.
+ *
+ * @param node a pointer to the root node of the branch to be destroyed.
+ * @return the new pointer to the parent node, use this to update pointers to
+ * 		   root if the parent node is root.
+ */
+parseTreeNode *parseTreeDeallocateBranch(parseTreeNode *node);
+

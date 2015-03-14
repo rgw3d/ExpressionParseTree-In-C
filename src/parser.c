@@ -87,10 +87,22 @@ parseTreeNode *parseTreeNodeRealloc(parseTreeNode *node, int newChildCount) {
 	parseTreeNode *parent = node->parent;
 	int parIndex = -1;
 
-	if (newChildCount <= node->childCount) {
-		// TODO: dbg msg
-		parserStateOk = false;
-		return NULL;
+	bool childCountDecrease = false;
+	if (newChildCount == node->childCount){
+		// no resize needed
+		return node;
+	}
+	if (newChildCount < node->childCount) {
+		childCountDecrease = true;
+
+		// Ensure that no references will be dropped if resized
+		for(int i = newChildCount; i < EXPR_N && i < node->childCount; i++){
+			if(node->children[i] != NULL){
+				parserStateOk = false;
+				// TODO: dbg msg
+				return NULL;
+			}
+		}
 	}
 
 	// Get the position where the node is reference in the parent
@@ -123,15 +135,17 @@ parseTreeNode *parseTreeNodeRealloc(parseTreeNode *node, int newChildCount) {
 	}
 
 	// Update children
-	for (int i = 0; i < oldChildCount; i++) {
+	for (int i = 0; i < oldChildCount && i < newChildCount; i++) {
 		if (ptr->children[i] != NULL) {
 			ptr->children[i]->parent = ptr;
 		}
 	}
 
 	// Set new pointers to NULL
-	memset(&ptr->children[oldChildCount], 0,
+	if(!childCountDecrease){
+		memset(&ptr->children[oldChildCount], 0,
 			sizeof(void *) * (newChildCount - oldChildCount));
+	}
 
 	// Update child count
 	ptr->childCount = newChildCount;
@@ -400,4 +414,65 @@ parseTreeNode *parserExec() {
 	mwfree(topElement, sizeof(pNode));
 
 	return root;
+}
+
+
+parseTreeNode *parseTreeDeallocateBranch(parseTreeNode *node){
+	if(node->parent == NULL){
+		return NULL; // TODO: dbg msg
+		// You should destroy the tree with parseTreeDestroy.
+	}
+
+	parseTreeNode *newParentPtr = NULL;
+
+	// Update parent references
+	for(int i = 0; i < node->parent->childCount; i++){
+		if(node->parent->children[i] == node){
+			if(i < EXPR_N - 1){
+				// reference is not at last element
+				// shift array left
+				if(node->parent->childCount - 1 - i > 0)
+					memmove(&node->parent->children[i], &node->parent->children[i + 1], sizeof(void *) * node->parent->childCount - 1 - i);
+			}
+
+
+			// set last element to null
+			node->parent->children[node->parent->childCount - 1] = NULL;
+
+			// Resize parent node
+			newParentPtr = parseTreeNodeRealloc(node->parent, node->parent->childCount - 1);
+		}
+	}
+
+	// Creates a stack to store references to child nodes.
+	pNode *topElement = stackCreateNode();
+	pNode **top = &topElement;
+	// Push the root of the branch to the stack
+	stackPush(top, node);
+
+	// While the stack is not empty
+	while (topElement->p != NULL) {
+		// Pop stack
+		parseTreeNode *next = (parseTreeNode *) topElement->p;
+		stackPop(top);
+
+		// Add children to the stack
+		for (int i = 0; i < next->childCount && next->children != NULL; i++) {
+			if (next->children[i] != NULL) {
+				stackPush(top, next->children[i]);
+			}
+		}
+
+		// Free memory
+		mwfree(next,
+				sizeof(parseTreeNode)
+						+ sizeof(parseTreeNode *) * next->childCount);
+	}
+
+	// Destroy stack used to track child nodes
+	stackDestroy(top);
+	// Free stack root
+	mwfree(topElement, sizeof(pNode));
+
+	return newParentPtr;
 }

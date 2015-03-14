@@ -5,8 +5,11 @@
 #include "ptrstack.h"
 #include "memwrapper.h"
 #include <inttypes.h>
+#include "switches.h"
+#include <string.h>
+#include <stdlib.h>
 
-void parserGenerateDotFile(parseTreeNode *root) {
+void parserGenerateDotFile(parseTreeNode *root, const char * filename) {
 	// Creates a stack to store references to child nodes.
 	pNode *topElement = stackCreateNode();
 	pNode **top = &topElement;
@@ -14,7 +17,12 @@ void parserGenerateDotFile(parseTreeNode *root) {
 	stackPush(top, root);
 
 	// Open file
-	FILE *output = fopen("parsetree.dot", "w");
+	FILE *output = fopen(filename, "w");
+
+	if(output == NULL){
+		// TODO: dbg msg
+		return;
+	}
 
 	fprintf(output, "digraph parseTree{\n");
 
@@ -76,4 +84,17 @@ void parserGenerateDotFile(parseTreeNode *root) {
 	// Destroy stack used to track child nodes
 	stackDestroy(top);
 	mwfree(*top, sizeof(pNode));
+
+	if(PARSER_GEN_SVG_FROM_DOT){
+		char s[1000];
+		strcpy(s, "dot -Tsvg -O ");
+		if(strlen(s) + strlen(filename) >= 1000){
+			// abort
+			// TODO: dbg msg
+		} else {
+			strcat(s, filename);
+			system(s);
+			printf("[PARSER] Generated svg file from parse tree.\n");
+		}
+	}
 }

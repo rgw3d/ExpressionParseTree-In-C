@@ -35,3 +35,8 @@
  * The number of columns to print on a page by the parserDisplayPredictTable.
  */
 #define PARSER_GEN_PRINT_COLS 10
+
+/**
+ * Auto generate svg files from dot files with system call.
+ */
+#define PARSER_GEN_SVG_FROM_DOT 0
